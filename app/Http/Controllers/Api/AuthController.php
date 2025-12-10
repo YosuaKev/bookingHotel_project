@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -160,7 +161,7 @@ class AuthController extends Controller
                 ['email' => $request->email],
                 [
                     'name' => $request->name,
-                    'password' => Hash::make(str_random(32)),
+                    'password' => Hash::make(Str::random(32)),
                     'provider' => 'google',
                     'provider_id' => $request->provider_id,
                 ]
@@ -210,7 +211,7 @@ class AuthController extends Controller
                 ['email' => $request->email],
                 [
                     'name' => $request->name,
-                    'password' => Hash::make(str_random(32)),
+                    'password' => Hash::make(Str::random(32)),
                     'provider' => 'microsoft',
                     'provider_id' => $request->provider_id,
                 ]

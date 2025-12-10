@@ -64,6 +64,7 @@
         .auth-buttons {
             display: flex;
             gap: 15px;
+            align-items: center;
         }
 
         .btn-sign-in, .btn-sign-up {
@@ -444,6 +445,11 @@
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             height: 400px;
+        }
+
+        .map-iframe {
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .features-section {
@@ -924,7 +930,7 @@
                     <p><strong>Phone:</strong> +1 (555) 123-4567</p>
                     <p><strong>Email:</strong> info@luxora.com</p>
                 </div>
-                <div id="map"></div>
+                <iframe class="map-iframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2483.680381865203!2d-0.12720032418974786!3d51.50073251119139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487604c38c8cd1d9%3A0xb78f2474b9a45aa9!2sBig%20Ben!5e0!3m2!1sid!2sid!4v1765361073174!5m2!1sid!2sid" width="100%" height="400" style="border:0; border-radius: 10px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>
@@ -1029,131 +1035,7 @@
         </div>
     </footer>
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"></script>
     <script>
-        // Initialize Google Map
-        function initMap() {
-            // Hotel location coordinates (you can change these to your actual location)
-            const hotelLocation = { lat: 40.7128, lng: -74.0060 }; // New York example
-            
-            const map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 15,
-                center: hotelLocation,
-                styles: [
-                    {
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#1a1a1f" }]
-                    },
-                    {
-                        "elementType": "labels.text.stroke",
-                        "stylers": [{ "color": "#242f3e" }]
-                    },
-                    {
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#746855" }]
-                    },
-                    {
-                        "featureType": "administrative.locality",
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#d59563" }]
-                    },
-                    {
-                        "featureType": "poi",
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#d59563" }]
-                    },
-                    {
-                        "featureType": "poi.park",
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#263c3f" }]
-                    },
-                    {
-                        "featureType": "poi.park",
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#6b9080" }]
-                    },
-                    {
-                        "featureType": "road",
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#38414e" }]
-                    },
-                    {
-                        "featureType": "road",
-                        "elementType": "geometry.stroke",
-                        "stylers": [{ "color": "#212a37" }]
-                    },
-                    {
-                        "featureType": "road",
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#9ca5b3" }]
-                    },
-                    {
-                        "featureType": "road.highway",
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#746855" }]
-                    },
-                    {
-                        "featureType": "road.highway",
-                        "elementType": "geometry.stroke",
-                        "stylers": [{ "color": "#1f2835" }]
-                    },
-                    {
-                        "featureType": "road.highway",
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#f3751ff" }]
-                    },
-                    {
-                        "featureType": "transit",
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#2f3948" }]
-                    },
-                    {
-                        "featureType": "transit.station",
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#d59563" }]
-                    },
-                    {
-                        "featureType": "water",
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#17263c" }]
-                    },
-                    {
-                        "featureType": "water",
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#515c6d" }]
-                    },
-                    {
-                        "featureType": "water",
-                        "elementType": "labels.text.stroke",
-                        "stylers": [{ "color": "#17263c" }]
-                    }
-                ]
-            });
-
-            // Add marker for hotel location
-            const marker = new google.maps.Marker({
-                position: hotelLocation,
-                map: map,
-                title: 'LUXORA Hotels',
-                icon: 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
-            });
-
-            // Add info window
-            const infoWindow = new google.maps.InfoWindow({
-                content: `
-                    <div style="color: #333; padding: 10px;">
-                        <h3 style="color: #ff6b35; margin: 0 0 5px 0;">LUXORA Hotels</h3>
-                        <p style="margin: 5px 0;">123 Luxury Lane<br>Premium City, PC 12345</p>
-                        <p style="margin: 5px 0;"><strong>Phone:</strong> +1 (555) 123-4567</p>
-                    </div>
-                `
-            });
-
-            marker.addListener('click', () => {
-                infoWindow.open(map, marker);
-            });
-        }
-
         // Menu toggle functionality
         const menuToggle = document.getElementById('menuToggle');
         const mainNav = document.getElementById('mainNav');

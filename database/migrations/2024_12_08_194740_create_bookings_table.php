@@ -13,13 +13,24 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->string('room_id')->nullable();
-            $table->string('name')->nullable();
-            $table->string('email')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('start_date')->nullable();
-            $table->string('end_date')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('booking_id')->unique();
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('email');
+            $table->string('phone');
+            $table->string('room_type');
+            $table->dateTime('check_in');
+            $table->dateTime('check_out');
+            $table->integer('guests');
+            $table->integer('nights');
+            $table->decimal('rate', 10, 2);
+            $table->decimal('total', 10, 2);
+            $table->text('special_requests')->nullable();
+            $table->string('status')->default('confirmed');
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

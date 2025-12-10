@@ -366,6 +366,15 @@
     <!-- Booking Section -->
     <section class="booking-section">
         <div class="container">
+            <!-- Auth Check Alert -->
+            <div id="authCheckAlert" style="display: none; padding: 20px; background-color: rgba(255, 87, 34, 0.1); border: 1px solid #ff5722; border-radius: 8px; color: #ff9966; margin-bottom: 30px; text-align: center;">
+                <p style="font-size: 16px; margin-bottom: 15px;">You must be logged in to make a booking</p>
+                <a href="signin.html" style="display: inline-block; padding: 10px 25px; background-color: #ff6b35; color: #fff; text-decoration: none; border-radius: 5px; font-weight: 600; margin-right: 10px;">Sign In</a>
+                <a href="signup.html" style="display: inline-block; padding: 10px 25px; background-color: transparent; color: #ff6b35; border: 2px solid #ff6b35; text-decoration: none; border-radius: 5px; font-weight: 600;">Sign Up</a>
+            </div>
+
+            <!-- Booking Form Container (hidden if not logged in) -->
+            <div id="bookingContainer">
             <div class="booking-header">
                 <h1>Complete Your Booking</h1>
                 <p>Fill in your details to reserve your perfect room</p>
@@ -508,6 +517,7 @@
                     </div>
                 </div>
             </div>
+            </div>
         </div>
     </section>
 
@@ -638,6 +648,9 @@
 
             localStorage.setItem('lastBooking', JSON.stringify(booking));
 
+            // Save booking to database
+            saveBookingToDatabase(booking);
+
             // Show success message
             successMessage.innerHTML = `✓ Booking confirmed! Confirmation sent to ${email}. Your booking ID is: ${booking.id}`;
             successMessage.classList.add('show');
@@ -647,6 +660,31 @@
                 alert(`Thank you for booking!\n\nBooking ID: ${booking.id}\nRoom: ${roomNames[roomType]}\nTotal: $${total.toFixed(2)}\n\nConfirmation email sent to ${email}`);
                 window.location.href = 'index.html';
             }, 2000);
+        }
+
+        function saveBookingToDatabase(booking) {
+            // Add user info to booking
+            const bookingData = {
+                ...booking,
+                userEmail: localStorage.getItem('userEmail'),
+                userId: localStorage.getItem('userId')
+            };
+
+            // Send booking data to backend API
+            fetch('/api/bookings/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Booking saved to database:', data);
+            })
+            .catch(error => {
+                console.log('Note: Backend API not available, using localStorage only:', error);
+            });
         }
 
         // Set minimum check-in date to today
@@ -676,6 +714,27 @@
             sessionStorage.removeItem('selectedRoom');
             sessionStorage.removeItem('roomPrice');
         }
+
+        // Check if user is logged in on page load
+        function checkAuthentication() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userEmail = localStorage.getItem('userEmail');
+            const authCheckAlert = document.getElementById('authCheckAlert');
+            const bookingContainer = document.getElementById('bookingContainer');
+
+            if (!isLoggedIn || !userEmail) {
+                // User not logged in
+                authCheckAlert.style.display = 'block';
+                bookingContainer.style.display = 'none';
+            } else {
+                // User is logged in
+                authCheckAlert.style.display = 'none';
+                bookingContainer.style.display = 'block';
+            }
+        }
+
+        // Call authentication check when page loads
+        checkAuthentication();
     </script>
 </body>
 </html>

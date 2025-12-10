@@ -3,20 +3,42 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Booking extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'room_id',
-        'name',
+        'user_id',
+        'first_name',
+        'last_name',
         'email',
         'phone',
-        'start_date',
-        'end_date',
+        'room_type',
+        'check_in',
+        'check_out',
+        'guests',
+        'nights',
+        'rate',
+        'total',
+        'booking_id',
+        'status',
+        'special_requests'
     ];
 
-    public function room()
+    protected $casts = [
+        'check_in' => 'datetime',
+        'check_out' => 'datetime',
+        'total' => 'decimal:2',
+        'rate' => 'decimal:2'
+    ];
+
+    /**
+     * Get the user that owns the booking
+     */
+    public function user()
     {
-        return $this->hasOne('App\Models\Room', 'id','room_id');
+        return $this->belongsTo(User::class);
     }
 }
