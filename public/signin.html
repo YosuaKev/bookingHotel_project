@@ -329,33 +329,47 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    loginSuccessful(localUser);
+                if (data.success && data.token) {
+                    // Login successful with token from server
+                    loginSuccessful(data.user, data.token, 'server');
                 } else {
-                    // Use local auth as fallback
-                    loginSuccessful(localUser);
+                    // Use local auth as fallback (no backend server available)
+                    console.log('Backend login not available, using local authentication');
+                    loginSuccessful(localUser, null, 'local');
                 }
             })
             .catch(error => {
-                console.log('Backend unavailable, using local authentication');
-                loginSuccessful(localUser);
+                console.log('Backend unavailable, using local authentication:', error);
+                loginSuccessful(localUser, null, 'local');
             });
         }
 
-        function loginSuccessful(user) {
+        function loginSuccessful(user, authToken, authType) {
             // Simulate successful login
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.classList.remove('show');
             
+            // Extract first name from user object or name field
+            let firstName = user.firstName || (user.name ? user.name.split(' ')[0] : 'User');
+            let userId = user.id || user.userId || ('USR' + Date.now());
+            
             // Store user info in localStorage
             localStorage.setItem('userEmail', user.email);
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', user.firstName);
-            localStorage.setItem('userId', user.id);
+            localStorage.setItem('userName', firstName);
+            localStorage.setItem('userId', userId);
             localStorage.setItem('authProvider', user.provider || 'local');
+            
+            // Store auth token if available (CRITICAL for API calls)
+            if (authToken) {
+                localStorage.setItem('authToken', authToken);
+                console.log('Auth token stored successfully');
+            } else {
+                console.warn('No auth token received - API calls may fail');
+            }
 
             // Show success message and redirect
-            alert('Welcome ' + user.firstName + '! Sign in successful.');
+            alert('Welcome ' + firstName + '! Sign in successful.');
             window.location.href = 'index.html';
         }
 
@@ -404,6 +418,10 @@
             localStorage.setItem('userName', user.firstName);
             localStorage.setItem('userId', user.id);
             localStorage.setItem('authProvider', provider);
+            
+            // For OAuth, generate a mock token (in production would be from OAuth provider)
+            const mockToken = 'oauth_' + provider + '_' + Date.now();
+            localStorage.setItem('authToken', mockToken);
 
             // Redirect to home
             alert(`Welcome ${user.firstName}! Signed in with ${provider.toUpperCase()}.`);

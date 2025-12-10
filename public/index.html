@@ -72,20 +72,17 @@
             display: none;
         }
 
-        .mobile-nav-item {
-            display: none !important;
+        .mobile-nav-menu {
+            display: none;
         }
 
-        .mobile-nav-item.show {
-            display: block !important;
-        }
-
-        .mobile-auth-item {
-            display: none !important;
-        }
-
-        .mobile-auth-item.show {
-            display: block !important;
+        @media (min-width: 769px) {
+            .mobile-nav-item,
+            .mobile-auth-item,
+            .mobile-nav-menu,
+            .mobile-user-menu {
+                display: none !important;
+            }
         }
 
         .btn-sign-in, .btn-sign-up {
@@ -773,33 +770,44 @@
                 padding-left: 25px;
             }
 
-            .mobile-nav-item {
-                padding: 15px 20px;
-                border-bottom: 1px solid #333;
-                color: #ff6b35;
-                border-top: 1px solid #333;
-                margin-top: 10px;
+            .mobile-nav-menu {
+                position: fixed;
+                left: -100%;
+                top: 60px;
+                flex-direction: column;
+                background-color: #252530;
+                width: 100%;
+                text-align: left;
+                transition: 0.3s;
+                padding: 20px 0;
+                gap: 0;
+                max-height: calc(100vh - 60px);
+                overflow-y: auto;
+                display: flex !important;
             }
 
-            .mobile-nav-item:hover {
-                background-color: rgba(255, 107, 53, 0.1);
+            .mobile-nav-menu.active {
+                left: 0;
             }
 
-            .mobile-auth-item {
+            .mobile-nav-menu a {
                 padding: 12px 20px;
+                display: block;
                 border-bottom: 1px solid #333;
-                color: #fff;
-                margin-bottom: 5px;
+                color: #ccc;
+                transition: all 0.3s ease;
+                text-decoration: none;
             }
 
-            .mobile-auth-item:first-of-type {
-                border-top: 1px solid #333;
-                margin-top: 10px;
-            }
-
-            .mobile-auth-item:hover {
+            .mobile-nav-menu a:hover {
                 background-color: rgba(255, 107, 53, 0.1);
                 color: #ff6b35;
+                padding-left: 25px;
+            }
+
+            .mobile-nav-menu a:first-child {
+                border-top: 1px solid #333;
+                margin-top: 10px;
             }
 
             .auth-buttons {
@@ -1190,11 +1198,6 @@
                 <a href="#gallery">Gallery</a>
                 <a href="#features">Features</a>
                 <a href="#contact">Contact</a>
-                <a href="signin.html" class="mobile-auth-item">🔐 Sign In</a>
-                <a href="booking.html" class="mobile-auth-item">📅 Book Now</a>
-                <a href="history.html" class="mobile-nav-item">📋 History</a>
-                <a href="payment.html" class="mobile-nav-item">💳 Payment</a>
-                <a href="#" onclick="handleLogout(event)" class="mobile-nav-item">🚪 Logout</a>
             </nav>
             <button class="menu-toggle" id="menuToggle">
                 <span></span>
@@ -1217,6 +1220,10 @@
                 <a href="payment.html">💳 Payment</a>
                 <a href="#" onclick="handleLogout(event)">🚪 Logout</a>
             </div>
+            <nav class="mobile-nav-menu" id="mobileNavMenu">
+                <a href="signin.html">🔐 Sign In</a>
+                <a href="booking.html">📅 Book Now</a>
+            </nav>
         </div>
     </header>
 
@@ -1504,15 +1511,23 @@
         // Menu toggle functionality
         const menuToggle = document.getElementById('menuToggle');
         const mainNav = document.getElementById('mainNav');
+        const mobileNavMenu = document.getElementById('mobileNavMenu');
         const mobileUserMenu = document.getElementById('mobileUserMenu');
 
         menuToggle.addEventListener('click', function() {
-            mainNav.classList.toggle('active');
-            menuToggle.classList.toggle('active');
-            // Close user menu when opening nav
-            if (mainNav.classList.contains('active')) {
-                mobileUserMenu.classList.remove('active');
+            const isMobileNavActive = mobileNavMenu.classList.contains('active');
+            const isMobileUserActive = mobileUserMenu.classList.contains('active');
+            
+            // Toggle whichever is currently visible
+            if (window.innerWidth <= 768) {
+                const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                if (isLoggedIn) {
+                    mobileUserMenu.classList.toggle('active');
+                } else {
+                    mobileNavMenu.classList.toggle('active');
+                }
             }
+            menuToggle.classList.toggle('active');
         });
 
         // Close menu when a link is clicked
@@ -1520,17 +1535,33 @@
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
                 mainNav.classList.remove('active');
+                mobileNavMenu.classList.remove('active');
+                mobileUserMenu.classList.remove('active');
                 menuToggle.classList.remove('active');
             });
         });
 
-        // Close mobile user menu when a link is clicked
-        const mobileUserLinks = mobileUserMenu.querySelectorAll('a');
-        mobileUserLinks.forEach(link => {
+        // Close menu when mobile nav menu link is clicked
+        const mobileNavLinks = mobileNavMenu.querySelectorAll('a');
+        mobileNavLinks.forEach(link => {
             link.addEventListener('click', function() {
-                mobileUserMenu.classList.remove('active');
+                mainNav.classList.remove('active');
+                mobileNavMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
             });
         });
+
+        // Close menu when mobile user menu link is clicked
+        if (mobileUserMenu) {
+            const mobileUserLinks = mobileUserMenu.querySelectorAll('a');
+            mobileUserLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mainNav.classList.remove('active');
+                    mobileUserMenu.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                });
+            });
+        }
 
         // Handle search form
         function handleSearch(event) {
@@ -1650,8 +1681,6 @@
             const userButtons = document.getElementById('userButtons');
             const userGreeting = document.getElementById('userGreeting');
             const mobileUserGreeting = document.getElementById('mobileUserGreeting');
-            const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
-            const mobileAuthItems = document.querySelectorAll('.mobile-auth-item');
 
             if (isLoggedIn && userName) {
                 // Desktop
@@ -1659,27 +1688,11 @@
                 userButtons.style.display = 'flex';
                 userGreeting.textContent = `Welcome, ${userName}!`;
                 mobileUserGreeting.textContent = `Welcome, ${userName}!`;
-                
-                // Mobile
-                mobileAuthItems.forEach(item => {
-                    item.classList.remove('show');
-                });
-                mobileNavItems.forEach(item => {
-                    item.classList.add('show');
-                });
             } else {
                 // Desktop
                 authButtons.style.display = 'flex';
                 userButtons.style.display = 'none';
                 mobileUserGreeting.style.display = 'none';
-                
-                // Mobile
-                mobileAuthItems.forEach(item => {
-                    item.classList.add('show');
-                });
-                mobileNavItems.forEach(item => {
-                    item.classList.remove('show');
-                });
             }
         }
 

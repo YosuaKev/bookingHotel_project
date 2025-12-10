@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Integration Test</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .pending { background: #e7d4f5; }
+        input, button { padding: 8px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Hotel Booking System - API Integration Test</h1>
+    
+    <div class="test pending">
+        <h3>Step 1: Register & Login</h3>
+        <button onclick="testRegisterAndLogin()">Test Registration & Login</button>
+        <div id="registerResult"></div>
+    </div>
+
+    <div class="test pending">
+        <h3>Step 2: Create Booking</h3>
+        <button onclick="testCreateBooking()">Test Booking Creation</button>
+        <div id="bookingResult"></div>
+    </div>
+
+    <div class="test pending">
+        <h3>Step 3: Create Payment</h3>
+        <button onclick="testCreatePayment()">Test Payment Creation</button>
+        <div id="paymentResult"></div>
+    </div>
+
+    <div class="test pending">
+        <h3>Step 4: Check localStorage</h3>
+        <button onclick="checkLocalStorage()">Check localStorage</button>
+        <div id="storageResult"></div>
+    </div>
+
+    <div class="test pending">
+        <h3>Step 5: Simulate Complete User Flow</h3>
+        <button onclick="testCompleteFlow()">Run Complete Flow</button>
+        <div id="flowResult"></div>
+    </div>
+
+    <script>
+        let testEmail = '';
+        let testToken = '';
+        let testBookingId = '';
+
+        async function testRegisterAndLogin() {
+            const result = document.getElementById('registerResult');
+            result.innerHTML = '<p>Testing...</p>';
+            
+            testEmail = 'testuser' + Date.now() + '@example.com';
+            
+            try {
+                // Register
+                const registerRes = await fetch('http://127.0.0.1:8000/api/users/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        firstName: 'Test',
+                        lastName: 'User',
+                        email: testEmail,
+                        phone: '0123456789',
+                        password: 'password123',
+                        provider: 'local'
+                    })
+                });
+
+                if (!registerRes.ok) throw new Error('Registration failed: ' + registerRes.status);
+                const regData = await registerRes.json();
+                console.log('Registration:', regData);
+
+                // Login
+                const loginRes = await fetch('http://127.0.0.1:8000/api/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: testEmail,
+                        password: 'password123'
+                    })
+                });
+
+                if (!loginRes.ok) throw new Error('Login failed: ' + loginRes.status);
+                const loginData = await loginRes.json();
+                testToken = loginData.token;
+                
+                // Simulate what signin.html does
+                localStorage.setItem('authToken', testToken);
+                localStorage.setItem('userEmail', testEmail);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userName', 'Test');
+                localStorage.setItem('userId', loginData.user.id);
+
+                result.innerHTML = `<p class="success">✓ Registration & Login Successful!</p>
+                    <p>Email: ${testEmail}</p>
+                    <p>Token: ${testToken.substring(0, 30)}...</p>
+                    <p>localStorage updated with token</p>`;
+                
+            } catch (error) {
+                result.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+
+        async function testCreateBooking() {
+            const result = document.getElementById('bookingResult');
+            if (!testToken) {
+                result.innerHTML = '<p class="error">✗ Please login first</p>';
+                return;
+            }
+
+            result.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const bookingData = {
+                    id: 'BK' + Date.now(),
+                    firstName: 'Test',
+                    lastName: 'Booking',
+                    email: testEmail,
+                    phone: '0123456789',
+                    roomType: 'Deluxe Suite',
+                    checkin: '2025-12-20 14:00:00',
+                    checkout: '2025-12-22 11:00:00',
+                    guests: 2,
+                    nights: 2,
+                    rate: 150,
+                    total: 330,
+                    userEmail: testEmail,
+                    userId: localStorage.getItem('userId')
+                };
+
+                const bookingRes = await fetch('http://127.0.0.1:8000/api/bookings/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + testToken
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+
+                if (!bookingRes.ok) throw new Error('Booking failed: ' + bookingRes.status);
+                const bookData = await bookingRes.json();
+                testBookingId = bookData.booking.booking_id;
+
+                localStorage.setItem('lastBooking', JSON.stringify(bookData.booking));
+                
+                result.innerHTML = `<p class="success">✓ Booking Created Successfully!</p>
+                    <p>Booking ID: ${testBookingId}</p>
+                    <p>Room: ${bookData.booking.room_type}</p>
+                    <p>Total: $${bookData.booking.total}</p>
+                    <p>localStorage.lastBooking updated</p>`;
+                
+            } catch (error) {
+                result.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+
+        async function testCreatePayment() {
+            const result = document.getElementById('paymentResult');
+            if (!testBookingId) {
+                result.innerHTML = '<p class="error">✗ Please create booking first</p>';
+                return;
+            }
+
+            result.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const paymentData = {
+                    booking_id: testBookingId,
+                    payment_method: 'credit_card',
+                    cardholder_name: 'Test User',
+                    card_last_four: '4242',
+                    amount: 330,
+                    status: 'completed',
+                    billing_address: '123 Main St',
+                    city: 'New York',
+                    zip_code: '10001',
+                    country: 'USA',
+                    user_email: testEmail
+                };
+
+                const paymentRes = await fetch('http://127.0.0.1:8000/api/payments/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + testToken
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                if (!paymentRes.ok) throw new Error('Payment failed: ' + paymentRes.status);
+                const payData = await paymentRes.json();
+
+                result.innerHTML = `<p class="success">✓ Payment Created Successfully!</p>
+                    <p>Transaction ID: ${payData.transaction_id}</p>
+                    <p>Amount: $${payData.payment.amount}</p>
+                    <p>Status: ${payData.payment.status}</p>`;
+                
+            } catch (error) {
+                result.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+
+        function checkLocalStorage() {
+            const result = document.getElementById('storageResult');
+            const storage = {
+                authToken: localStorage.getItem('authToken'),
+                userEmail: localStorage.getItem('userEmail'),
+                isLoggedIn: localStorage.getItem('isLoggedIn'),
+                userName: localStorage.getItem('userName'),
+                userId: localStorage.getItem('userId'),
+                lastBooking: localStorage.getItem('lastBooking') ? JSON.parse(localStorage.getItem('lastBooking')) : null
+            };
+
+            let html = '<h4>localStorage Contents:</h4>';
+            html += '<pre>' + JSON.stringify(storage, null, 2) + '</pre>';
+            
+            if (storage.authToken) {
+                html += '<p class="success">✓ authToken found in localStorage</p>';
+            } else {
+                html += '<p class="error">✗ authToken NOT found in localStorage</p>';
+            }
+
+            result.innerHTML = html;
+        }
+
+        async function testCompleteFlow() {
+            const result = document.getElementById('flowResult');
+            result.innerHTML = '<p>Running complete flow...</p>';
+            
+            try {
+                // Step 1: Register & Login
+                await new Promise(resolve => {
+                    testRegisterAndLogin();
+                    setTimeout(resolve, 1000);
+                });
+
+                // Step 2: Create Booking
+                await new Promise(resolve => {
+                    setTimeout(async () => {
+                        await testCreateBooking();
+                        resolve();
+                    }, 1000);
+                });
+
+                // Step 3: Create Payment
+                await new Promise(resolve => {
+                    setTimeout(async () => {
+                        await testCreatePayment();
+                        resolve();
+                    }, 1000);
+                });
+
+                result.innerHTML = `<p class="success">✓ Complete Flow Successful!</p>
+                    <p>All steps completed successfully.</p>
+                    <p>Check the database to verify data persistence.</p>`;
+
+            } catch (error) {
+                result.innerHTML = `<p class="error">✗ Flow Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

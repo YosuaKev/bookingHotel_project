@@ -739,6 +739,32 @@
 
         // Load payment data
         function loadPaymentData() {
+            // Try to fetch from API first
+            const token = localStorage.getItem('authToken');
+            
+            fetch(`/api/my-payments`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.payments && data.payments.length > 0) {
+                    displayPayments(data.payments);
+                } else {
+                    // Fallback to localStorage
+                    loadPaymentFromLocalStorage();
+                }
+            })
+            .catch(error => {
+                console.log('API not available, using localStorage');
+                loadPaymentFromLocalStorage();
+            });
+        }
+
+        function loadPaymentFromLocalStorage() {
             const bookingId = sessionStorage.getItem('selectedBookingId');
             const lastBooking = JSON.parse(localStorage.getItem('lastBooking') || '{}');
 
@@ -748,6 +774,22 @@
                 return;
             }
 
+            displayPaymentDetails(lastBooking);
+        }
+
+        function displayPayments(payments) {
+            // If user has payments, display the last one or create form for new payment
+            if (payments.length > 0) {
+                const lastPayment = payments[payments.length - 1];
+                if (lastPayment.booking) {
+                    displayPaymentDetails(lastPayment.booking);
+                }
+            } else {
+                loadPaymentFromLocalStorage();
+            }
+        }
+
+        function displayPaymentDetails(lastBooking) {
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('paymentForm').style.display = 'block';
 
@@ -907,19 +949,44 @@
                 user_email: localStorage.getItem('userEmail')
             };
 
+            const token = localStorage.getItem('authToken');
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
             fetch('/api/payments/create', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: headers,
                 body: JSON.stringify(paymentData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    console.log('Response status:', response.status);
+                    return response.json().then(error => {
+                        throw new Error(JSON.stringify(error));
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log('Payment saved to database:', data);
+                // Update booking with payment info
+                if (data.transaction_id) {
+                    const updatedBooking = {
+                        ...booking,
+                        paymentId: data.payment.id,
+                        transactionId: data.transaction_id,
+                        paidStatus: 'paid'
+                    };
+                    localStorage.setItem('lastBooking', JSON.stringify(updatedBooking));
+                }
             })
             .catch(error => {
-                console.log('Note: Backend API not available, using localStorage only:', error);
+                console.log('Payment save note:', error.message);
             });
         }
 

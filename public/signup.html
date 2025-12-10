@@ -494,10 +494,43 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('User saved to database:', data);
+                if (data.success) {
+                    console.log('User saved to database:', data);
+                    // After registration, auto-login with the credentials
+                    autoLoginAfterSignup(user.email, user.password);
+                } else {
+                    console.log('Backend registration failed:', data);
+                }
             })
             .catch(error => {
                 console.log('Note: Backend API not available, using localStorage only:', error);
+            });
+        }
+
+        function autoLoginAfterSignup(email, password) {
+            // Automatically login user after signup to get auth token
+            fetch('/api/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.token) {
+                    // Store auth token
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userEmail', data.user.email);
+                    localStorage.setItem('userId', data.user.id);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    console.log('Auto-login successful with token');
+                } else {
+                    console.log('Auto-login failed, user will need to login manually');
+                }
+            })
+            .catch(error => {
+                console.log('Auto-login error:', error);
             });
         }
 
@@ -542,7 +575,12 @@
             localStorage.setItem('userEmail', email);
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userName', newUser.firstName);
+            localStorage.setItem('userId', newUser.id);
             localStorage.setItem('authProvider', provider);
+            
+            // For OAuth, generate a mock token (in production would be from OAuth provider)
+            const mockToken = 'oauth_' + provider + '_' + Date.now();
+            localStorage.setItem('authToken', mockToken);
 
             const successMessage = document.getElementById('successMessage');
             successMessage.innerHTML = `✓ ${provider.toUpperCase()} account linked! Redirecting...`;

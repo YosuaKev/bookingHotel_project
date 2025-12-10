@@ -650,6 +650,11 @@
             const taxes = subtotal * 0.1;
             const total = subtotal + taxes;
 
+            // Convert dates to ISO datetime format (YYYY-MM-DDTHH:mm:ss)
+            // Check-in at 3:00 PM (15:00), Check-out at 11:00 AM (11:00)
+            const checkinDateTime = checkin + 'T15:00:00';
+            const checkoutDateTime = checkout + 'T11:00:00';
+
             // Store booking in localStorage
             const booking = {
                 id: 'BK' + Date.now(),
@@ -658,8 +663,8 @@
                 email,
                 phone,
                 roomType: roomNames[roomType],
-                checkin,
-                checkout,
+                checkin: checkinDateTime,
+                checkout: checkoutDateTime,
                 guests,
                 nights,
                 rate,
@@ -691,17 +696,34 @@
                 userId: localStorage.getItem('userId')
             };
 
+            // Get auth token
+            const authToken = localStorage.getItem('authToken');
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            
+            // Add authorization header if token exists
+            if (authToken) {
+                headers['Authorization'] = 'Bearer ' + authToken;
+            }
+
             // Send booking data to backend API
             fetch('/api/bookings/create', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: headers,
                 body: JSON.stringify(bookingData)
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Booking saved to database:', data);
+                if (data.success) {
+                    console.log('Booking saved to database:', data);
+                    // Store booking ID in localStorage for reference
+                    if (data.booking && data.booking.id) {
+                        localStorage.setItem('lastBookingId', data.booking.id);
+                    }
+                } else {
+                    console.log('Booking API response:', data);
+                }
             })
             .catch(error => {
                 console.log('Note: Backend API not available, using localStorage only:', error);

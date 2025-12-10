@@ -592,17 +592,31 @@
         // Load booking history from localStorage and database
         function loadBookingHistory() {
             const userEmail = localStorage.getItem('userEmail');
+            const token = localStorage.getItem('authToken');
             
+            // Jika tidak ada token, coba dengan email
+            if (!token) {
+                loadFromLocalStorage();
+                return;
+            }
+
             // Try to fetch from API first
             fetch(`/api/my-bookings`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    console.log('API fetch status:', response.status);
+                    throw new Error('API Error');
+                }
+                return response.json();
+            })
             .then(data => {
-                if (data.success && data.bookings.length > 0) {
+                if (data.success && data.bookings && data.bookings.length > 0) {
                     displayBookings(data.bookings);
                 } else {
                     // Fallback to localStorage
@@ -610,6 +624,7 @@
                 }
             })
             .catch(error => {
+                console.log('API fetch failed, using localStorage:', error.message);
                 // Fallback to localStorage if API not available
                 loadFromLocalStorage();
             });
