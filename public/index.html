@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1f">
+    <title>Luxury Hotel - Book Your Stay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1f;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: rgba(26, 26, 31, 0.98);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6b35;
+            letter-spacing: 2px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav a:hover {
+            color: #ff6b35;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-sign-in, .btn-sign-up {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sign-in {
+            color: #ff6b35;
+            border: 2px solid #ff6b35;
+            background: transparent;
+        }
+
+        .btn-sign-in:hover {
+            background-color: #ff6b35;
+            color: #1a1a1f;
+        }
+
+        .btn-sign-up {
+            background-color: #ff6b35;
+            color: #1a1a1f;
+        }
+
+        .btn-sign-up:hover {
+            background-color: #ff5722;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background-color: #ff6b35;
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+
+        .hero {
+            min-height: 600px;
+            background: linear-gradient(135deg, rgba(42, 42, 50, 0.7) 0%, rgba(26, 26, 31, 0.7) 100%), url('images/banner1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .slider-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .slider-dot.active {
+            background-color: #ff6b35;
+            transform: scale(1.3);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #aaa;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 100%;
+            position: relative;
+            z-index: 3;
+        }
+
+        .search-card form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .btn-search {
+            background-color: #ff6b35;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-search:hover {
+            background-color: #ff5722;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .hotels {
+            padding: 80px 20px;
+            background-color: #1a1a1f;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hotels h2 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 50px;
+            color: #fff;
+        }
+
+        .hotels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .hotel-card {
+            background-color: #252530;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .hotel-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 107, 53, 0.2);
+        }
+
+        .hotel-image {
+            position: relative;
+            overflow: hidden;
+            height: 250px;
+        }
+
+        .hotel-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .hotel-card:hover .hotel-image img {
+            transform: scale(1.05);
+        }
+
+        .price-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #ff6b35;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .hotel-info {
+            padding: 20px;
+        }
+
+        .hotel-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .rating {
+            color: #ff6b35;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .hotel-info p {
+            color: #aaa;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .btn-book {
+            background-color: #ff6b35;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .btn-book:hover {
+            background-color: #ff5722;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .gallery-section {
+            padding: 80px 20px;
+            background-color: #1a1a1f;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-section h2 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 50px;
+            color: #fff;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            height: 250px;
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .location-section {
+            padding: 80px 20px;
+            background-color: #252530;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .location-section h2 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 50px;
+            color: #fff;
+        }
+
+        .location-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .location-info h3 {
+            color: #ff6b35;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .location-info p {
+            color: #aaa;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .location-info ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .location-info li {
+            color: #aaa;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .location-info li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+
+        #map {
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            height: 400px;
+        }
+
+        .features-section {
+            padding: 80px 20px;
+            background-color: #1a1a1f;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-section h2 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 50px;
+            color: #fff;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: #252530;
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b35;
+            text-align: center;
+        }
+
+        .feature-card h3 {
+            color: #ff6b35;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .feature-card p {
+            color: #aaa;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .amenities h2 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 50px;
+            color: #fff;
+        }
+
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .amenity-item {
+            text-align: center;
+        }
+
+        .amenity-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .amenity-item h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #ff6b35;
+        }
+
+        .amenity-item p {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .reviews {
+            padding: 80px 20px;
+            background-color: #1a1a1f;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .reviews h2 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 50px;
+            color: #fff;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .review-card {
+            background-color: #252530;
+            padding: 40px;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b35;
+            margin-bottom: 25px;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff5722 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .review-text {
+            color: #ccc;
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .review-author h4 {
+            color: #ff6b35;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        .review-author p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        footer {
+            background-color: #0f0f13;
+            padding: 50px 20px 20px;
+            border-top: 1px solid #333;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h4 {
+            color: #ff6b35;
+            margin-bottom: 15px;
+        }
+
+        .footer-section p, .footer-section a {
+            color: #aaa;
+            font-size: 14px;
+            line-height: 1.8;
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: #ff6b35;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 10px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                position: fixed;
+                left: -100%;
+                top: 60px;
+                flex-direction: column;
+                background-color: #252530;
+                width: 100%;
+                text-align: center;
+                transition: 0.3s;
+                padding: 30px 0;
+                gap: 0;
+            }
+
+            .nav.active {
+                left: 0;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .menu-toggle.active span:nth-child(1) {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:nth-child(3) {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+
+            .nav a {
+                padding: 15px 0;
+                display: block;
+                border-bottom: 1px solid #333;
+            }
+
+            .auth-buttons {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .search-card {
+                max-width: 100%;
+            }
+
+            .hotels h2, .amenities h2, .reviews h2 {
+                font-size: 32px;
+            }
+
+            .location-container {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            #map {
+                height: 300px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">LUXORA</div>
+            <nav class="nav" id="mainNav">
+                <a href="#home">Home</a>
+                <a href="#rooms">Rooms</a>
+                <a href="#amenities">Amenities</a>
+                <a href="#gallery">Gallery</a>
+                <a href="#location">Location</a>
+                <a href="#features">Features</a>
+                <a href="#reviews">Reviews</a>
+                <a href="#contact">Contact</a>
+            </nav>
+            <button class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="auth-buttons" id="authButtons">
+                <a href="signin.html" class="btn-sign-in">Sign In</a>
+                <a href="booking.html" class="btn-sign-up">Book Now</a>
+            </div>
+            <div class="auth-buttons" id="userButtons" style="display: none; gap: 20px;">
+                <span id="userGreeting" style="color: #ccc; font-weight: 500;"></span>
+                <a href="#" onclick="handleLogout(event)" class="btn-sign-in">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Experience Luxury</h1>
+            <p>Find your perfect hotel room at the best prices</p>
+        </div>
+        <div class="search-card">
+            <form onsubmit="handleSearch(event)">
+                <div class="form-group">
+                    <label>Check In Date</label>
+                    <input type="date" required>
+                </div>
+                <div class="form-group">
+                    <label>Check Out Date</label>
+                    <input type="date" required>
+                </div>
+                <div class="form-group">
+                    <label>Number of Guests</label>
+                    <select required>
+                        <option value="">Select guests</option>
+                        <option value="1">1 Guest</option>
+                        <option value="2">2 Guests</option>
+                        <option value="3">3 Guests</option>
+                        <option value="4">4+ Guests</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-search">Search Hotels</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Featured Hotels -->
+    <section class="hotels" id="rooms">
+        <div class="container">
+            <h2>Featured Hotels</h2>
+            <div class="hotels-grid">
+                <div class="hotel-card">
+                    <div class="hotel-image">
+                        <img src="images/room1.jpg" alt="Luxury Suite">
+                        <div class="price-badge">$199/night</div>
+                    </div>
+                    <div class="hotel-info">
+                        <h3>Luxury Suite</h3>
+                        <p class="rating">⭐⭐⭐⭐⭐ (120 reviews)</p>
+                        <p>Premium accommodation with ocean view and modern amenities perfect for special occasions</p>
+                        <button class="btn-book" onclick="bookRoom('Luxury Suite', 199)">Book Now</button>
+                    </div>
+                </div>
+                <div class="hotel-card">
+                    <div class="hotel-image">
+                        <img src="images/room2.jpg" alt="Deluxe Room">
+                        <div class="price-badge">$149/night</div>
+                    </div>
+                    <div class="hotel-info">
+                        <h3>Deluxe Room</h3>
+                        <p class="rating">⭐⭐⭐⭐⭐ (95 reviews)</p>
+                        <p>Comfortable spacious room with city view and quality service for business travelers</p>
+                        <button class="btn-book" onclick="bookRoom('Deluxe Room', 149)">Book Now</button>
+                    </div>
+                </div>
+                <div class="hotel-card">
+                    <div class="hotel-image">
+                        <img src="images/room3.jpg" alt="Standard Room">
+                        <div class="price-badge">$99/night</div>
+                    </div>
+                    <div class="hotel-info">
+                        <h3>Standard Room</h3>
+                        <p class="rating">⭐⭐⭐⭐ (80 reviews)</p>
+                        <p>Affordable and clean room with essential amenities and friendly staff</p>
+                        <button class="btn-book" onclick="bookRoom('Standard Room', 99)">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Amenities -->
+    <section class="amenities" id="amenities">
+        <div class="container">
+            <h2>Our Amenities</h2>
+            <div class="amenities-grid">
+                <div class="amenity-item">
+                    <div class="amenity-icon">🏊</div>
+                    <h3>Swimming Pool</h3>
+                    <p>Olympic-sized heated pool with spa services</p>
+                </div>
+                <div class="amenity-item">
+                    <div class="amenity-icon">🍽️</div>
+                    <h3>Fine Dining</h3>
+                    <p>Award-winning restaurant with gourmet cuisine</p>
+                </div>
+                <div class="amenity-item">
+                    <div class="amenity-icon">💪</div>
+                    <h3>Fitness Center</h3>
+                    <p>State-of-the-art gym with personal trainers</p>
+                </div>
+                <div class="amenity-item">
+                    <div class="amenity-icon">🛎️</div>
+                    <h3>24/7 Concierge</h3>
+                    <p>Round-the-clock service and assistance</p>
+                </div>
+                <div class="amenity-item">
+                    <div class="amenity-icon">🌐</div>
+                    <h3>Free WiFi</h3>
+                    <p>High-speed internet throughout the hotel</p>
+                </div>
+                <div class="amenity-item">
+                    <div class="amenity-icon">🎰</div>
+                    <h3>Business Center</h3>
+                    <p>Fully equipped meeting and conference rooms</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery-section" id="gallery">
+        <div class="container">
+            <h2>Hotel Gallery</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="images/gallery1.jpg" alt="Hotel exterior">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery2.jpg" alt="Hotel lobby">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery3.jpg" alt="Room interior">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery4.jpg" alt="Restaurant">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery5.jpg" alt="Pool area">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery6.jpg" alt="Conference room">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery7.jpg" alt="Spa">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery8.jpg" alt="Dining">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Section with Google Maps -->
+    <section class="location-section" id="location">
+        <div class="container">
+            <h2>Our Location</h2>
+            <div class="location-container">
+                <div class="location-info">
+                    <h3>Find Us Here</h3>
+                    <p>Located in the heart of the city, LUXORA Hotels offers the perfect blend of comfort and convenience. Our strategic location provides easy access to major attractions, shopping centers, and business districts.</p>
+                    
+                    <h3 style="margin-top: 30px;">Why Choose Our Location?</h3>
+                    <ul>
+                        <li>5 minutes from downtown shopping district</li>
+                        <li>10 minutes from international airport</li>
+                        <li>Walking distance to restaurants and cafes</li>
+                        <li>Adjacent to public transportation hub</li>
+                        <li>Near major tourist attractions</li>
+                        <li>Safe and vibrant neighborhood</li>
+                    </ul>
+
+                    <h3 style="margin-top: 30px;">Contact Details</h3>
+                    <p><strong>Address:</strong> 123 Luxury Lane, Premium City, PC 12345</p>
+                    <p><strong>Phone:</strong> +1 (555) 123-4567</p>
+                    <p><strong>Email:</strong> info@luxora.com</p>
+                </div>
+                <div id="map"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <h2>Why Stay With Us</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>🏆 Award Winning</h3>
+                    <p>Winner of multiple international hospitality awards for excellence in service and design</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💎 Luxury Experience</h3>
+                    <p>Premium amenities and world-class service delivered by our dedicated staff</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🌍 Global Presence</h3>
+                    <p>Part of an international hotel network with properties in 50+ countries</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💰 Best Price Guarantee</h3>
+                    <p>We promise the best rates - find a lower price, and we'll match it plus 10% discount</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📱 Easy Booking</h3>
+                    <p>Simple and secure online booking system with instant confirmation</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎁 Loyalty Program</h3>
+                    <p>Earn points with every stay and redeem them for free nights and upgrades</p>
+                </div>
+            </div>
+        </div>
+    </section>
+        <div class="container">
+            <h2>Guest Reviews</h2>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">SJ</div>
+                        <div class="review-author">
+                            <h4>Sarah Johnson</h4>
+                            <p>New York, USA</p>
+                        </div>
+                    </div>
+                    <p class="review-text">"Amazing experience! The staff was incredibly helpful and the rooms are spotless. Will definitely come back!"</p>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">MC</div>
+                        <div class="review-author">
+                            <h4>Michael Chen</h4>
+                            <p>Tokyo, Japan</p>
+                        </div>
+                    </div>
+                    <p class="review-text">"Best hotel I've stayed at. The amenities are world-class and the location is perfect for business."</p>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">EW</div>
+                        <div class="review-author">
+                            <h4>Emma Williams</h4>
+                            <p>London, UK</p>
+                        </div>
+                    </div>
+                    <p class="review-text">"Exceptional service and beautiful views. The breakfast was delicious and the room was very clean."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>About LUXORA</h4>
+                    <p>Providing luxury accommodation and exceptional service since 2010. Our commitment to excellence makes us the choice of discerning travelers worldwide.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#rooms">Our Rooms</a></li>
+                        <li><a href="#amenities">Amenities</a></li>
+                        <li><a href="#reviews">Reviews</a></li>
+                        <li><a href="#">Special Offers</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Information</h4>
+                    <p><strong>Email:</strong> <a href="mailto:info@luxora.com">info@luxora.com</a></p>
+                    <p><strong>Phone:</strong> <a href="tel:+15551234567">+1 (555) 123-4567</a></p>
+                    <p><strong>Address:</strong> 123 Luxury Lane, Premium City, PC 12345</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 LUXORA Hotels. All rights reserved. | <a href="#" style="color: #ff6b35;">Privacy Policy</a> | <a href="#" style="color: #ff6b35;">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"></script>
+    <script>
+        // Initialize Google Map
+        function initMap() {
+            // Hotel location coordinates (you can change these to your actual location)
+            const hotelLocation = { lat: 40.7128, lng: -74.0060 }; // New York example
+            
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: hotelLocation,
+                styles: [
+                    {
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#1a1a1f" }]
+                    },
+                    {
+                        "elementType": "labels.text.stroke",
+                        "stylers": [{ "color": "#242f3e" }]
+                    },
+                    {
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#746855" }]
+                    },
+                    {
+                        "featureType": "administrative.locality",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#d59563" }]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#d59563" }]
+                    },
+                    {
+                        "featureType": "poi.park",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#263c3f" }]
+                    },
+                    {
+                        "featureType": "poi.park",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#6b9080" }]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#38414e" }]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "geometry.stroke",
+                        "stylers": [{ "color": "#212a37" }]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#9ca5b3" }]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#746855" }]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "geometry.stroke",
+                        "stylers": [{ "color": "#1f2835" }]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#f3751ff" }]
+                    },
+                    {
+                        "featureType": "transit",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#2f3948" }]
+                    },
+                    {
+                        "featureType": "transit.station",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#d59563" }]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#17263c" }]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#515c6d" }]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "labels.text.stroke",
+                        "stylers": [{ "color": "#17263c" }]
+                    }
+                ]
+            });
+
+            // Add marker for hotel location
+            const marker = new google.maps.Marker({
+                position: hotelLocation,
+                map: map,
+                title: 'LUXORA Hotels',
+                icon: 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
+            });
+
+            // Add info window
+            const infoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div style="color: #333; padding: 10px;">
+                        <h3 style="color: #ff6b35; margin: 0 0 5px 0;">LUXORA Hotels</h3>
+                        <p style="margin: 5px 0;">123 Luxury Lane<br>Premium City, PC 12345</p>
+                        <p style="margin: 5px 0;"><strong>Phone:</strong> +1 (555) 123-4567</p>
+                    </div>
+                `
+            });
+
+            marker.addListener('click', () => {
+                infoWindow.open(map, marker);
+            });
+        }
+
+        // Menu toggle functionality
+        const menuToggle = document.getElementById('menuToggle');
+        const mainNav = document.getElementById('mainNav');
+
+        menuToggle.addEventListener('click', function() {
+            mainNav.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked
+        const navLinks = mainNav.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mainNav.classList.remove('active');
+                menuToggle.classList.remove('active');
+            });
+        });
+
+        // Handle search form
+        function handleSearch(event) {
+            event.preventDefault();
+            alert('Search functionality will redirect to booking page');
+        }
+
+        // Book room function
+        function bookRoom(roomName, price) {
+            // Store room info in sessionStorage and redirect to booking page
+            sessionStorage.setItem('selectedRoom', roomName);
+            sessionStorage.setItem('roomPrice', price);
+            window.location.href = 'booking.html';
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Hero Slider functionality
+        let currentSlide = 0;
+        const slides = ['images/banner1.jpg', 'images/banner2.jpg', 'images/banner3.jpg'];
+        
+        function updateSlider(index) {
+            currentSlide = (index + slides.length) % slides.length;
+            const hero = document.querySelector('.hero');
+            hero.style.backgroundImage = `linear-gradient(135deg, rgba(42, 42, 50, 0.7) 0%, rgba(26, 26, 31, 0.7) 100%), url('${slides[currentSlide]}')`;
+            
+            // Update slider dots
+            const dots = document.querySelectorAll('.slider-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+        
+        function nextSlide() {
+            updateSlider(currentSlide + 1);
+        }
+        
+        function goToSlide(index) {
+            updateSlider(index);
+        }
+        
+        // Add click listeners to slider dots
+        document.querySelectorAll('.slider-dot').forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                goToSlide(index);
+                // Reset auto-slide timer
+                clearInterval(sliderTimer);
+                sliderTimer = setInterval(nextSlide, 5000);
+            });
+        });
+        
+        // Auto-slide every 5 seconds
+        let sliderTimer = setInterval(nextSlide, 5000);
+        
+        // Stop auto-slide on mouse hover
+        const hero = document.querySelector('.hero');
+        hero.addEventListener('mouseenter', () => {
+            clearInterval(sliderTimer);
+        });
+        
+        hero.addEventListener('mouseleave', () => {
+            sliderTimer = setInterval(nextSlide, 5000);
+        });
+
+        // Check if user is logged in and update UI
+        function updateAuthUI() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userName = localStorage.getItem('userName');
+            const authButtons = document.getElementById('authButtons');
+            const userButtons = document.getElementById('userButtons');
+            const userGreeting = document.getElementById('userGreeting');
+
+            if (isLoggedIn && userName) {
+                authButtons.style.display = 'none';
+                userButtons.style.display = 'flex';
+                userGreeting.textContent = `Welcome, ${userName}!`;
+            } else {
+                authButtons.style.display = 'flex';
+                userButtons.style.display = 'none';
+            }
+        }
+
+        function handleLogout(event) {
+            event.preventDefault();
+            
+            // Call logout API
+            fetch('/api/user/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .catch(error => {
+                console.log('Backend unavailable, using local logout');
+            })
+            .finally(() => {
+                // Clear localStorage
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('authProvider');
+                
+                // Redirect to home
+                alert('You have been logged out successfully.');
+                window.location.href = 'index.html';
+            });
+        }
+
+        // Update UI on page load
+        updateAuthUI();
+    </script>
+</body>
+</html>

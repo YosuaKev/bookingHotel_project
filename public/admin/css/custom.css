@@ -1,0 +1,66 @@
+:root{
+	--site-blue:#1f6feb; /* softer, modern blue */
+	--site-blue-dark:#155bb0;
+	--muted:#8a8d93;
+	--card-padding:16px;
+}
+
+/* Color overrides: change overly bright blues to a softer tone */
+a, .nav-link, .breadcrumb a {
+	color: var(--site-blue);
+}
+a:hover, .nav-link:hover {
+	color: var(--site-blue-dark);
+}
+.btn-primary, .btn.btn-primary {
+	background-color: var(--site-blue) !important;
+	border-color: var(--site-blue-dark) !important;
+	color: #fff !important;
+}
+.btn-primary:hover, .btn-primary:focus {
+	background-color: var(--site-blue-dark) !important;
+}
+
+/* Global spacing improvements */
+.container-fluid{padding-left:20px;padding-right:20px}
+.page-content{padding:18px 0}
+.page-header{padding:18px 0;margin-bottom:12px}
+.block{padding:var(--card-padding);margin-bottom:18px;border-radius:8px}
+
+/* Statistic blocks: reduce crowdedness and align numbers */
+.statistic-block.block{padding:12px 14px}
+.statistic-block .progress-details .title{font-size:14px}
+.statistic-block .number{font-size:20px}
+
+/* Messages and lists spacing */
+.messages .message{padding:10px 12px;border-radius:8px;margin-bottom:8px}
+.checklist .item{padding:8px 10px}
+
+/* Cards and panels margins */
+.public-user-block.block, .user-block.block{padding:14px}
+
+/* Footer spacing */
+.footer__block{padding:18px 0}
+
+/* Make form inputs and buttons more consistent */
+input.form-control, .form-control{padding:10px 12px;border-radius:6px}
+.btn{padding:8px 12px}
+
+/* Utility adjustments to reduce oversized gaps */
+.no-padding-top{padding-top:0}
+.no-padding-bottom{padding-bottom:0}
+
+/* Responsive tweaks */
+@media(max-width:768px){
+	.container-fluid{padding-left:12px;padding-right:12px}
+	.block{padding:12px}
+}
+
+/* Small visual polish for admin sidebar */
+#sidebar{padding-top:18px}
+#sidebar .sidebar-header{padding:12px}
+
+/* If other pages use .badge-primary override to match new blue */
+.badge-primary{background-color:var(--site-blue);color:#fff}
+
+/* End of custom overrides */

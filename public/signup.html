@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1f">
+    <title>Sign Up - LUXORA Hotel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1f 0%, #252530 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 450px;
+            background-color: #252530;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-signup {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff6b35;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .signup-subtitle {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #1a1a1f;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            font-size: 12px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            background-color: #333;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-bar.weak {
+            background-color: #ff5722;
+        }
+
+        .strength-bar.medium {
+            background-color: #ffc107;
+        }
+
+        .strength-bar.strong {
+            background-color: #4caf50;
+        }
+
+        .terms-checkbox {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            font-size: 13px;
+        }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #ff6b35;
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
+
+        .terms-checkbox label {
+            color: #999;
+            margin: 0;
+        }
+
+        .terms-checkbox a {
+            color: #ff6b35;
+            text-decoration: none;
+        }
+
+        .terms-checkbox a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-signup {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff5722 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-signup:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #333;
+        }
+
+        .divider span {
+            margin: 0 15px;
+        }
+
+        .social-signup {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .social-btn {
+            padding: 12px;
+            background-color: #1a1a1f;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #ccc;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .social-btn:hover {
+            border-color: #ff6b35;
+            color: #ff6b35;
+        }
+
+        .signin-link {
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .signin-link a {
+            color: #ff6b35;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .signin-link a:hover {
+            color: #ff5722;
+        }
+
+        .error-message {
+            display: none;
+            padding: 12px;
+            background-color: rgba(255, 87, 34, 0.1);
+            border: 1px solid #ff5722;
+            border-radius: 8px;
+            color: #ff9966;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            display: none;
+            padding: 12px;
+            background-color: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            color: #81c784;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .signup-container {
+                padding: 40px 25px;
+            }
+
+            .signup-header {
+                margin-bottom: 30px;
+            }
+
+            .logo-signup {
+                font-size: 28px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .social-signup {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <div class="logo-signup">LUXORA</div>
+            <p class="signup-subtitle">Create your account</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <form id="signupForm" onsubmit="handleSignUp(event)">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" placeholder="John" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" placeholder="Doe" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+                <div class="password-strength">
+                    <div class="strength-bar" id="strength1"></div>
+                    <div class="strength-bar" id="strength2"></div>
+                    <div class="strength-bar" id="strength3"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required>
+            </div>
+
+            <div class="terms-checkbox">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a></label>
+            </div>
+
+            <button type="submit" class="btn-signup">Create Account</button>
+        </form>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <div class="social-signup">
+            <a href="#" class="social-btn" onclick="handleGoogleSignUp(event)">
+                <span>🔵</span> Google
+            </a>
+            <a href="#" class="social-btn" onclick="handleMicrosoftSignUp(event)">
+                <span>🔷</span> Microsoft
+            </a>
+        </div>
+
+        <div class="signin-link">
+            Already have an account? <a href="signin.html">Sign in here</a>
+        </div>
+    </div>
+
+    <script>
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strength = calculatePasswordStrength(password);
+            
+            const strength1 = document.getElementById('strength1');
+            const strength2 = document.getElementById('strength2');
+            const strength3 = document.getElementById('strength3');
+
+            strength1.className = 'strength-bar';
+            strength2.className = 'strength-bar';
+            strength3.className = 'strength-bar';
+
+            if (strength >= 1) strength1.classList.add('weak');
+            if (strength >= 2) {
+                strength1.classList.remove('weak');
+                strength1.classList.add('medium');
+                strength2.classList.add('medium');
+            }
+            if (strength >= 3) {
+                strength1.classList.remove('medium');
+                strength1.classList.add('strong');
+                strength2.classList.remove('medium');
+                strength2.classList.add('strong');
+                strength3.classList.add('strong');
+            }
+        });
+
+        function calculatePasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password) && /[!@#$%^&*]/.test(password)) strength++;
+            return strength;
+        }
+
+        function handleSignUp(event) {
+            event.preventDefault();
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            // Reset messages
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+
+            // Validation
+            if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
+                errorMessage.textContent = 'Please fill in all fields';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            if (password.length < 6) {
+                errorMessage.textContent = 'Password must be at least 6 characters';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Passwords do not match';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            if (!terms) {
+                errorMessage.textContent = 'Please agree to terms and conditions';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Check if email already exists
+            const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            if (existingUsers.some(user => user.email === email)) {
+                errorMessage.textContent = 'Email already registered. Please sign in instead.';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Create new user
+            const newUser = {
+                id: 'USR' + Date.now(),
+                firstName,
+                lastName,
+                email,
+                phone,
+                password: btoa(password), // Simple base64 encoding (use proper hashing in production)
+                createdAt: new Date().toLocaleString(),
+                provider: 'local'
+            };
+
+            // Save user to localStorage
+            existingUsers.push(newUser);
+            localStorage.setItem('users', JSON.stringify(existingUsers));
+
+            // Also attempt to save to server database
+            saveUserToDatabase(newUser);
+
+            // Show success message
+            successMessage.innerHTML = `✓ Account created successfully! Redirecting to sign in...`;
+            successMessage.classList.add('show');
+
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'signin.html';
+            }, 2000);
+        }
+
+        function saveUserToDatabase(user) {
+            // Send user data to backend API
+            fetch('/api/users/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('User saved to database:', data);
+            })
+            .catch(error => {
+                console.log('Note: Backend API not available, using localStorage only:', error);
+            });
+        }
+
+        function handleGoogleSignUp(event) {
+            event.preventDefault();
+            // In production, this would open Google OAuth 2.0 dialog
+            // For now, show a popup
+            alert('Google Sign-Up Feature\n\nIn production, this would:\n1. Redirect to Google OAuth\n2. Get user profile data\n3. Auto-create account\n4. Redirect to dashboard\n\nTo implement:\n- Add Google OAuth credentials\n- Create OAuth handler endpoint\n- Store OAuth tokens securely');
+            
+            // Simulate successful signup
+            simulateOAuthSignup('google', 'user@gmail.com');
+        }
+
+        function handleMicrosoftSignUp(event) {
+            event.preventDefault();
+            // In production, this would open Microsoft OAuth 2.0 dialog
+            // For now, show a popup
+            alert('Microsoft Sign-Up Feature\n\nIn production, this would:\n1. Redirect to Microsoft OAuth\n2. Get user profile data\n3. Auto-create account\n4. Redirect to dashboard\n\nTo implement:\n- Add Microsoft OAuth credentials\n- Create OAuth handler endpoint\n- Store OAuth tokens securely');
+            
+            // Simulate successful signup
+            simulateOAuthSignup('microsoft', 'user@outlook.com');
+        }
+
+        function simulateOAuthSignup(provider, email) {
+            const newUser = {
+                id: 'USR' + Date.now(),
+                firstName: 'User',
+                lastName: provider.charAt(0).toUpperCase() + provider.slice(1),
+                email: email,
+                phone: '',
+                password: '',
+                createdAt: new Date().toLocaleString(),
+                provider: provider
+            };
+
+            const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            if (!existingUsers.some(user => user.email === email)) {
+                existingUsers.push(newUser);
+                localStorage.setItem('users', JSON.stringify(existingUsers));
+            }
+
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', newUser.firstName);
+            localStorage.setItem('authProvider', provider);
+
+            const successMessage = document.getElementById('successMessage');
+            successMessage.innerHTML = `✓ ${provider.toUpperCase()} account linked! Redirecting...`;
+            successMessage.classList.add('show');
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        // Check if already logged in
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
