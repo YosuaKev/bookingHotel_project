@@ -720,6 +720,35 @@
             document.getElementById('checkout').min = checkinDate.toISOString().split('T')[0];
         });
 
+        // Load booking search data from homepage search form
+        function loadSearchData() {
+            const searchData = sessionStorage.getItem('bookingSearchData');
+            if (searchData) {
+                try {
+                    const data = JSON.parse(searchData);
+                    
+                    // Pre-populate form fields with search data
+                    if (data.checkin) {
+                        document.getElementById('checkin').value = data.checkin;
+                    }
+                    if (data.checkout) {
+                        document.getElementById('checkout').value = data.checkout;
+                    }
+                    if (data.guests) {
+                        document.getElementById('guests').value = data.guests;
+                    }
+                    
+                    // Update summary with new data
+                    updateSummary();
+                    
+                    // Clear sessionStorage after loading
+                    sessionStorage.removeItem('bookingSearchData');
+                } catch (error) {
+                    console.log('Error loading search data:', error);
+                }
+            }
+        }
+
         // Pre-populate room from sessionStorage if available
         const selectedRoom = sessionStorage.getItem('selectedRoom');
         if (selectedRoom) {
@@ -751,6 +780,9 @@
                 // User is logged in
                 authCheckAlert.style.display = 'none';
                 bookingContainer.style.display = 'block';
+                
+                // Load search data from homepage if available
+                loadSearchData();
             }
         }
 

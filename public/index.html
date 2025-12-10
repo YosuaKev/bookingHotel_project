@@ -21,7 +21,7 @@
 
         header {
             background-color: rgba(26, 26, 31, 0.98);
-            padding: 1rem 0;
+            padding: 0.8rem 0;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -35,6 +35,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 0 20px;
+            min-height: 60px;
         }
 
         .logo {
@@ -65,6 +66,26 @@
             display: flex;
             gap: 15px;
             align-items: center;
+        }
+
+        .mobile-user-menu {
+            display: none;
+        }
+
+        .mobile-nav-item {
+            display: none !important;
+        }
+
+        .mobile-nav-item.show {
+            display: block !important;
+        }
+
+        .mobile-auth-item {
+            display: none !important;
+        }
+
+        .mobile-auth-item.show {
+            display: block !important;
         }
 
         .btn-sign-in, .btn-sign-up {
@@ -101,14 +122,15 @@
             background: none;
             border: none;
             cursor: pointer;
+            gap: 5px;
         }
 
         .menu-toggle span {
             width: 25px;
             height: 3px;
             background-color: #ff6b35;
-            margin: 5px 0;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            display: block;
         }
 
         .hero {
@@ -248,6 +270,10 @@
         .hotels {
             padding: 80px 20px;
             background-color: #1a1a1f;
+            width: 100%;
+        }
+
+        .hotels .container {
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -352,6 +378,10 @@
         .gallery-section {
             padding: 80px 20px;
             background-color: #1a1a1f;
+            width: 100%;
+        }
+
+        .gallery-section .container {
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -391,6 +421,10 @@
         .location-section {
             padding: 80px 20px;
             background-color: #252530;
+            width: 100%;
+        }
+
+        .location-section .container {
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -455,6 +489,10 @@
         .features-section {
             padding: 80px 20px;
             background-color: #1a1a1f;
+            width: 100%;
+        }
+
+        .features-section .container {
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -528,6 +566,11 @@
         .reviews {
             padding: 80px 20px;
             background-color: #1a1a1f;
+            width: 100%;
+            margin-bottom: 60px;
+        }
+
+        .reviews .container {
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -543,6 +586,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
+            margin-bottom: 50px;
         }
 
         .review-card {
@@ -613,11 +657,13 @@
             background-color: #0f0f13;
             padding: 50px 20px 20px;
             border-top: 1px solid #333;
+            width: 100%;
         }
 
         .footer-container {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 0 auto;
+            padding: 0 20px;
         }
 
         .footer-content {
@@ -666,6 +712,16 @@
         }
 
         @media (max-width: 768px) {
+            /* Header */
+            .header-container {
+                padding: 0 15px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            /* Navigation */
             .nav {
                 position: fixed;
                 left: -100%;
@@ -673,18 +729,22 @@
                 flex-direction: column;
                 background-color: #252530;
                 width: 100%;
-                text-align: center;
+                text-align: left;
                 transition: 0.3s;
-                padding: 30px 0;
+                padding: 20px 0;
                 gap: 0;
+                max-height: calc(100vh - 60px);
+                overflow-y: auto;
             }
 
             .nav.active {
                 left: 0;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             }
 
             .menu-toggle {
                 display: flex;
+                z-index: 101;
             }
 
             .menu-toggle.active span:nth-child(1) {
@@ -700,45 +760,421 @@
             }
 
             .nav a {
-                padding: 15px 0;
+                padding: 15px 20px;
                 display: block;
                 border-bottom: 1px solid #333;
+                color: #ccc;
+                transition: all 0.3s ease;
+            }
+
+            .nav a:hover {
+                background-color: rgba(255, 107, 53, 0.1);
+                color: #ff6b35;
+                padding-left: 25px;
+            }
+
+            .mobile-nav-item {
+                padding: 15px 20px;
+                border-bottom: 1px solid #333;
+                color: #ff6b35;
+                border-top: 1px solid #333;
+                margin-top: 10px;
+            }
+
+            .mobile-nav-item:hover {
+                background-color: rgba(255, 107, 53, 0.1);
+            }
+
+            .mobile-auth-item {
+                padding: 12px 20px;
+                border-bottom: 1px solid #333;
+                color: #fff;
+                margin-bottom: 5px;
+            }
+
+            .mobile-auth-item:first-of-type {
+                border-top: 1px solid #333;
+                margin-top: 10px;
+            }
+
+            .mobile-auth-item:hover {
+                background-color: rgba(255, 107, 53, 0.1);
+                color: #ff6b35;
             }
 
             .auth-buttons {
-                display: none;
+                display: none !important;
+            }
+
+            .mobile-user-menu {
+                display: flex !important;
+                flex-direction: column;
+                position: fixed;
+                left: -100%;
+                top: 60px;
+                background-color: #252530;
+                width: 100%;
+                padding: 20px 0;
+                transition: 0.3s;
+                z-index: 99;
+            }
+
+            .mobile-user-menu.active {
+                left: 0;
+            }
+
+            .mobile-user-menu a,
+            .mobile-user-menu span {
+                padding: 12px 20px;
+                display: block;
+                border-bottom: 1px solid #333;
+                color: #ccc;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .mobile-user-menu a:hover {
+                background-color: rgba(255, 107, 53, 0.1);
+                color: #ff6b35;
+                padding-left: 25px;
+            }
+
+            /* Hero Section */
+            .hero {
+                min-height: 400px;
+                padding: 40px 15px;
+                background-attachment: scroll;
             }
 
             .hero h1 {
-                font-size: 36px;
+                font-size: 32px;
+                margin-bottom: 15px;
             }
 
             .hero p {
+                font-size: 14px;
+                max-width: 300px;
+            }
+
+            .hero-content {
+                margin-bottom: 40px;
+            }
+
+            /* Search Card */
+            .search-card {
+                max-width: 100%;
+                padding: 20px;
+                width: 100%;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .search-card form {
+                gap: 12px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            .form-group input, .form-group select {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .btn-search {
+                padding: 10px;
+                font-size: 14px;
+                margin-top: 8px;
+            }
+
+            /* Sections */
+            .hotels, .gallery-section, .location-section, .features-section, .amenities, .reviews {
+                padding: 50px 15px;
+            }
+
+            .hotels h2, .amenities h2, .reviews h2, .gallery-section h2, .location-section h2, .features-section h2 {
+                font-size: 28px;
+                margin-bottom: 35px;
+            }
+
+            /* Hotels Grid */
+            .hotels-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .hotel-card {
+                border-radius: 8px;
+            }
+
+            .hotel-image {
+                height: 200px;
+            }
+
+            .hotel-info {
+                padding: 15px;
+            }
+
+            .hotel-info h3 {
+                font-size: 18px;
+                margin-bottom: 8px;
+            }
+
+            .btn-book {
+                padding: 10px 15px;
+                font-size: 13px;
+                margin-top: 12px;
+            }
+
+            /* Amenities Grid */
+            .amenities-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .amenity-item {
+                text-align: center;
+            }
+
+            .amenity-icon {
+                font-size: 40px;
+                margin-bottom: 10px;
+            }
+
+            .amenity-item h3 {
                 font-size: 16px;
+                margin-bottom: 8px;
+            }
+
+            .amenity-item p {
+                font-size: 13px;
+            }
+
+            /* Gallery Grid */
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .gallery-item {
+                height: 180px;
+                border-radius: 8px;
+            }
+
+            /* Location Container */
+            .location-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .location-info h3 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .location-info p {
+                font-size: 14px;
+            }
+
+            .location-info li {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            .map-iframe {
+                height: 300px !important;
+                border-radius: 8px;
+            }
+
+            /* Features Grid */
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .feature-card {
+                padding: 20px;
+                border-radius: 8px;
+            }
+
+            .feature-card h3 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            .feature-card p {
+                font-size: 13px;
+            }
+
+            /* Reviews Grid */
+            .reviews-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .review-card {
+                padding: 20px;
+                border-radius: 8px;
+            }
+
+            .review-header {
+                gap: 12px;
+                margin-bottom: 15px;
+            }
+
+            .review-avatar, .review-photo {
+                width: 45px;
+                height: 45px;
+            }
+
+            .review-author h4 {
+                font-size: 14px;
+            }
+
+            .review-author p {
+                font-size: 12px;
+            }
+
+            .review-text {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+
+            /* Footer */
+            footer {
+                padding: 40px 0 15px 0;
+            }
+
+            .footer-container {
+                padding: 0 15px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                margin-bottom: 20px;
+            }
+
+            .footer-section h4 {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            .footer-section p, .footer-section a {
+                font-size: 13px;
+            }
+
+            .footer-bottom {
+                font-size: 12px;
+                padding-top: 15px;
+            }
+
+            /* Container */
+            .container {
+                padding: 0 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Extra small devices */
+            .header-container {
+                padding: 0 10px;
+            }
+
+            .logo {
+                font-size: 18px;
+                letter-spacing: 1px;
+            }
+
+            .hero {
+                min-height: 350px;
+                padding: 30px 10px;
+            }
+
+            .hero h1 {
+                font-size: 26px;
+            }
+
+            .hero p {
+                font-size: 13px;
             }
 
             .search-card {
-                max-width: 100%;
+                padding: 15px;
             }
 
-            .hotels h2, .amenities h2, .reviews h2 {
-                font-size: 32px;
+            .hotels, .gallery-section, .location-section, .features-section, .amenities, .reviews {
+                padding: 40px 10px;
             }
 
-            .location-container {
+            .hotels h2, .amenities h2, .reviews h2, .gallery-section h2, .location-section h2, .features-section h2 {
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+
+            .hotels-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .amenities-grid {
                 grid-template-columns: 1fr;
             }
 
             .gallery-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            #map {
-                height: 300px;
-            }
-
-            .features-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .gallery-item {
+                height: 200px;
+            }
+
+            .location-info h3 {
+                font-size: 18px;
+            }
+
+            .nav a {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+
+            .price-badge {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .rating {
+                font-size: 13px;
+            }
+
+            .hotel-info p {
+                font-size: 13px;
+            }
+
+            .btn-book {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .feature-card {
+                padding: 15px;
+            }
+
+            .slider-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .amenity-icon {
+                font-size: 35px;
+            }
+
+            .container {
+                padding: 0 10px;
+            }
+
+            footer {
+                padding: 30px 10px 10px;
             }
         }
     </style>
@@ -754,6 +1190,11 @@
                 <a href="#gallery">Gallery</a>
                 <a href="#features">Features</a>
                 <a href="#contact">Contact</a>
+                <a href="signin.html" class="mobile-auth-item">🔐 Sign In</a>
+                <a href="booking.html" class="mobile-auth-item">📅 Book Now</a>
+                <a href="history.html" class="mobile-nav-item">📋 History</a>
+                <a href="payment.html" class="mobile-nav-item">💳 Payment</a>
+                <a href="#" onclick="handleLogout(event)" class="mobile-nav-item">🚪 Logout</a>
             </nav>
             <button class="menu-toggle" id="menuToggle">
                 <span></span>
@@ -770,6 +1211,12 @@
                 <a href="payment.html" style="color: #ccc; text-decoration: none; transition: color 0.3s;">💳 Payment</a>
                 <a href="#" onclick="handleLogout(event)" class="btn-sign-in">Logout</a>
             </div>
+            <div class="mobile-user-menu" id="mobileUserMenu">
+                <span id="mobileUserGreeting" style="color: #ccc; font-weight: 500; padding: 15px 20px; border-bottom: 1px solid #333;"></span>
+                <a href="history.html">📋 History</a>
+                <a href="payment.html">💳 Payment</a>
+                <a href="#" onclick="handleLogout(event)">🚪 Logout</a>
+            </div>
         </div>
     </header>
 
@@ -780,11 +1227,27 @@
             <p>Find your perfect hotel room at the best prices</p>
         </div>
         <div class="search-card">
-            <div style="text-align: center;">
-                <h2 style="margin-bottom: 20px; font-size: 28px;">Ready to Book?</h2>
-                <p style="margin-bottom: 25px; color: #ccc; font-size: 16px;">Choose your perfect room and start your luxury experience</p>
-                <a href="booking.html" class="btn-search" style="display: inline-block; text-decoration: none;">📅 Book Now</a>
-            </div>
+            <form onsubmit="handleBookingSearch(event)">
+                <div class="form-group">
+                    <label>Check In Date</label>
+                    <input type="date" id="searchCheckin" required>
+                </div>
+                <div class="form-group">
+                    <label>Check Out Date</label>
+                    <input type="date" id="searchCheckout" required>
+                </div>
+                <div class="form-group">
+                    <label>Number of Guests</label>
+                    <select id="searchGuests" required>
+                        <option value="">Select guests</option>
+                        <option value="1">1 Guest</option>
+                        <option value="2">2 Guests</option>
+                        <option value="3">3 Guests</option>
+                        <option value="4">4+ Guests</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-search">📅 Book Now</button>
+            </form>
         </div>
     </section>
 
@@ -864,7 +1327,7 @@
                     <p>High-speed internet throughout the hotel</p>
                 </div>
                 <div class="amenity-item">
-                    <div class="amenity-icon">🎰</div>
+                    <div class="amenity-icon">🏢</div>
                     <h3>Business Center</h3>
                     <p>Fully equipped meeting and conference rooms</p>
                 </div>
@@ -1041,10 +1504,15 @@
         // Menu toggle functionality
         const menuToggle = document.getElementById('menuToggle');
         const mainNav = document.getElementById('mainNav');
+        const mobileUserMenu = document.getElementById('mobileUserMenu');
 
         menuToggle.addEventListener('click', function() {
             mainNav.classList.toggle('active');
             menuToggle.classList.toggle('active');
+            // Close user menu when opening nav
+            if (mainNav.classList.contains('active')) {
+                mobileUserMenu.classList.remove('active');
+            }
         });
 
         // Close menu when a link is clicked
@@ -1053,6 +1521,14 @@
             link.addEventListener('click', function() {
                 mainNav.classList.remove('active');
                 menuToggle.classList.remove('active');
+            });
+        });
+
+        // Close mobile user menu when a link is clicked
+        const mobileUserLinks = mobileUserMenu.querySelectorAll('a');
+        mobileUserLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileUserMenu.classList.remove('active');
             });
         });
 
@@ -1067,6 +1543,42 @@
             // Store room info in sessionStorage and redirect to booking page
             sessionStorage.setItem('selectedRoom', roomName);
             sessionStorage.setItem('roomPrice', price);
+            window.location.href = 'booking.html';
+        }
+
+        // Handle search form submission
+        function handleBookingSearch(event) {
+            event.preventDefault();
+            
+            // Get form values
+            const checkin = document.getElementById('searchCheckin').value;
+            const checkout = document.getElementById('searchCheckout').value;
+            const guests = document.getElementById('searchGuests').value;
+            
+            // Validate dates
+            if (!checkin || !checkout || !guests) {
+                alert('Please fill in all search fields');
+                return;
+            }
+            
+            const checkinDate = new Date(checkin);
+            const checkoutDate = new Date(checkout);
+            
+            if (checkoutDate <= checkinDate) {
+                alert('Check-out date must be after check-in date');
+                return;
+            }
+            
+            // Store search data in sessionStorage
+            const searchData = {
+                checkin: checkin,
+                checkout: checkout,
+                guests: guests
+            };
+            
+            sessionStorage.setItem('bookingSearchData', JSON.stringify(searchData));
+            
+            // Redirect to booking page
             window.location.href = 'booking.html';
         }
 
@@ -1137,14 +1649,37 @@
             const authButtons = document.getElementById('authButtons');
             const userButtons = document.getElementById('userButtons');
             const userGreeting = document.getElementById('userGreeting');
+            const mobileUserGreeting = document.getElementById('mobileUserGreeting');
+            const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+            const mobileAuthItems = document.querySelectorAll('.mobile-auth-item');
 
             if (isLoggedIn && userName) {
+                // Desktop
                 authButtons.style.display = 'none';
                 userButtons.style.display = 'flex';
                 userGreeting.textContent = `Welcome, ${userName}!`;
+                mobileUserGreeting.textContent = `Welcome, ${userName}!`;
+                
+                // Mobile
+                mobileAuthItems.forEach(item => {
+                    item.classList.remove('show');
+                });
+                mobileNavItems.forEach(item => {
+                    item.classList.add('show');
+                });
             } else {
+                // Desktop
                 authButtons.style.display = 'flex';
                 userButtons.style.display = 'none';
+                mobileUserGreeting.style.display = 'none';
+                
+                // Mobile
+                mobileAuthItems.forEach(item => {
+                    item.classList.add('show');
+                });
+                mobileNavItems.forEach(item => {
+                    item.classList.remove('show');
+                });
             }
         }
 

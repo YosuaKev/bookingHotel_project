@@ -20,7 +20,7 @@
 
         .header {
             background-color: #1a1a1f;
-            padding: 15px 0;
+            padding: 0.8rem 0;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -34,6 +34,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            min-height: 60px;
         }
 
         .logo {
@@ -41,12 +42,42 @@
             font-weight: 700;
             color: #ff6b35;
             cursor: pointer;
+            text-decoration: none;
         }
 
         .nav-links {
             display: flex;
             gap: 30px;
             align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            background: none;
+            border: none;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background-color: #ff6b35;
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
         }
 
         .nav-links a {
@@ -86,6 +117,104 @@
         .page-header h1 {
             font-size: 32px;
             margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .nav-links {
+                position: fixed;
+                left: -100%;
+                top: 60px;
+                flex-direction: column;
+                background-color: #252530;
+                width: 100%;
+                text-align: left;
+                transition: 0.3s;
+                padding: 20px 0;
+                gap: 0;
+                max-height: calc(100vh - 60px);
+                overflow-y: auto;
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links a,
+            .logout-btn {
+                padding: 15px 20px;
+                display: block;
+                border-bottom: 1px solid #333;
+                color: #ccc;
+                width: 100%;
+                background: none;
+                border: none;
+                text-align: left;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+
+            .nav-links a:hover,
+            .logout-btn:hover {
+                background-color: rgba(255, 107, 53, 0.1);
+                color: #ff6b35;
+                padding-left: 25px;
+            }
+
+            .nav-links a[style*="color: #ff6b35"] {
+                background-color: rgba(255, 107, 53, 0.1);
+            }
+
+            .container {
+                padding: 30px 15px;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .bookings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                padding: 0 10px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .container {
+                padding: 20px 10px;
+            }
+
+            .page-header h1 {
+                font-size: 20px;
+            }
+
+            .page-header p {
+                font-size: 13px;
+            }
+
+            .nav-links a,
+            .logout-btn {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
         }
 
         .page-header p {
@@ -226,6 +355,7 @@
             display: flex;
             gap: 10px;
             justify-content: flex-end;
+            margin-top: 20px;
         }
 
         .btn-action {
@@ -365,13 +495,18 @@
     <header class="header">
         <div class="header-content">
             <a href="index.html" class="logo">LUXORA</a>
-            <div class="nav-links">
+            <nav class="nav-links" id="navLinks">
                 <a href="index.html">Home</a>
                 <a href="booking.html">Book Room</a>
                 <a href="history.html" style="color: #ff6b35;">History</a>
                 <a href="payment.html">Payment</a>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
-            </div>
+            </nav>
+            <button class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </header>
 
@@ -415,6 +550,26 @@
     </div>
 
     <script>
+        // Menu toggle functionality for mobile
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            });
+
+            // Close menu when a link is clicked
+            const navItems = navLinks.querySelectorAll('a');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navLinks.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                });
+            });
+        }
+
         // Check authentication
         function checkAuthentication() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
