@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - LUXORA Hotels</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f0f13;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #1a1a1f;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #333;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff6b35;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ff6b35;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff5722 100%);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .auth-check {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 87, 34, 0.1) 100%);
+            border: 1px solid #ff6b35;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #ff9966;
+        }
+
+        .auth-check p {
+            margin-bottom: 15px;
+        }
+
+        .auth-check a {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff5722 100%);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: transform 0.3s;
+        }
+
+        .auth-check a:hover {
+            transform: translateY(-2px);
+        }
+
+        .payment-container {
+            display: none;
+        }
+
+        .payment-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+
+        .payment-empty p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .payment-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .payment-form-section {
+            background: linear-gradient(135deg, #1a1a1f 0%, #252530 100%);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .payment-summary {
+            background: linear-gradient(135deg, #1a1a1f 0%, #252530 100%);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 25px;
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background-color: #0f0f13;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .summary-item.total {
+            border: none;
+            padding-top: 15px;
+            margin-bottom: 0;
+            color: #ff6b35;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .booking-info {
+            background-color: rgba(255, 107, 53, 0.05);
+            border-left: 3px solid #ff6b35;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .booking-info p {
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+
+        .booking-info .room-name {
+            color: #ff6b35;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .payment-method {
+            background-color: rgba(255, 107, 53, 0.05);
+            border: 1px solid #ff6b35;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .payment-method h3 {
+            color: #ff6b35;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .method-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .method-option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #ff6b35;
+        }
+
+        .method-option label {
+            margin: 0;
+            font-size: 13px;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .btn-pay {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff5722 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-pay:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 12px;
+            background-color: transparent;
+            color: #ff6b35;
+            border: 1px solid #ff6b35;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background-color: rgba(255, 107, 53, 0.1);
+        }
+
+        .error-message {
+            display: none;
+            padding: 12px;
+            background-color: rgba(255, 87, 34, 0.1);
+            border: 1px solid #ff5722;
+            border-radius: 8px;
+            color: #ff9966;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            display: none;
+            padding: 12px;
+            background-color: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            color: #81c784;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #81c784;
+            font-size: 12px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+
+        @media (max-width: 768px) {
+            .payment-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-summary {
+                position: static;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">LUXORA</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="booking.html">Book Room</a>
+                <a href="history.html">History</a>
+                <a href="payment.html" style="color: #ff6b35;">Payment</a>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>💳 Payment</h1>
+            <p>Complete your payment securely</p>
+        </div>
+
+        <!-- Auth Check -->
+        <div class="auth-check" id="authCheckAlert" style="display: none;">
+            <p>You must be logged in to process payment</p>
+            <a href="signin.html">Sign In</a>
+            <a href="signup.html">Sign Up</a>
+        </div>
+
+        <!-- Payment Container -->
+        <div class="payment-container" id="paymentContainer">
+            <!-- Empty State -->
+            <div class="payment-empty" id="emptyState">
+                <p style="font-size: 48px; margin-bottom: 10px;">📦</p>
+                <p>No pending payments</p>
+                <a href="booking.html" style="display: inline-block; background: linear-gradient(135deg, #ff6b35 0%, #ff5722 100%); color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-top: 20px;">Make a Booking</a>
+            </div>
+
+            <!-- Payment Form -->
+            <div id="paymentForm" style="display: none;">
+                <div class="payment-layout">
+                    <!-- Form Section -->
+                    <div class="payment-form-section">
+                        <div class="error-message" id="errorMessage"></div>
+                        <div class="success-message" id="successMessage"></div>
+
+                        <h2 style="margin-bottom: 25px; color: #ff6b35;">Payment Details</h2>
+
+                        <form onsubmit="handlePayment(event)">
+                            <!-- Payment Method -->
+                            <div class="payment-method">
+                                <h3>Payment Method</h3>
+                                <div class="method-option">
+                                    <input type="radio" id="credit" name="paymentMethod" value="credit_card" checked>
+                                    <label for="credit">💳 Credit Card</label>
+                                </div>
+                                <div class="method-option">
+                                    <input type="radio" id="debit" name="paymentMethod" value="debit_card">
+                                    <label for="debit">🏦 Debit Card</label>
+                                </div>
+                                <div class="method-option">
+                                    <input type="radio" id="bank" name="paymentMethod" value="bank_transfer">
+                                    <label for="bank">🏛️ Bank Transfer</label>
+                                </div>
+                            </div>
+
+                            <!-- Cardholder Name -->
+                            <div class="form-group">
+                                <label for="cardholderName">Cardholder Name</label>
+                                <input type="text" id="cardholderName" name="cardholderName" placeholder="John Doe" required>
+                            </div>
+
+                            <!-- Card Number -->
+                            <div class="form-group">
+                                <label for="cardNumber">Card Number</label>
+                                <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                            </div>
+
+                            <!-- Expiry & CVV -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expiryDate">Expiry Date (MM/YY)</label>
+                                    <input type="text" id="expiryDate" name="expiryDate" placeholder="12/25" maxlength="5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3" required>
+                                </div>
+                            </div>
+
+                            <!-- Billing Address -->
+                            <div class="form-group">
+                                <label for="billingAddress">Billing Address</label>
+                                <input type="text" id="billingAddress" name="billingAddress" placeholder="123 Main Street" required>
+                            </div>
+
+                            <!-- City & Zip -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="city">City</label>
+                                    <input type="text" id="city" name="city" placeholder="New York" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="zipCode">Zip Code</label>
+                                    <input type="text" id="zipCode" name="zipCode" placeholder="10001" required>
+                                </div>
+                            </div>
+
+                            <!-- Country -->
+                            <div class="form-group">
+                                <label for="country">Country</label>
+                                <select id="country" name="country" required>
+                                    <option value="">Select Country</option>
+                                    <option value="USA">United States</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="Japan">Japan</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Terms -->
+                            <div class="form-group" style="margin-bottom: 30px;">
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <label for="terms" style="display: inline; margin-left: 8px; font-weight: normal;">I agree to the <a href="#" style="color: #ff6b35;">Terms & Conditions</a></label>
+                            </div>
+
+                            <!-- Buttons -->
+                            <button type="submit" class="btn-pay">Pay $<span id="totalDisplay">0.00</span></button>
+                            <button type="button" class="btn-cancel" onclick="window.location.href='history.html'">Cancel</button>
+
+                            <!-- Security Badge -->
+                            <div class="security-badge">
+                                🔒 Secure Payment Verified
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Summary Section -->
+                    <div class="payment-summary">
+                        <h3 style="margin-bottom: 20px; color: #ff6b35;">Order Summary</h3>
+
+                        <div class="booking-info" id="bookingInfo">
+                            <div class="room-name" id="roomNameDisplay">Luxury Suite</div>
+                            <p><strong>Check-In:</strong> <span id="checkinDisplay">-</span></p>
+                            <p><strong>Check-Out:</strong> <span id="checkoutDisplay">-</span></p>
+                            <p><strong>Nights:</strong> <span id="nightsDisplay">-</span></p>
+                            <p><strong>Guests:</strong> <span id="guestsDisplay">-</span></p>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Nightly Rate</span>
+                            <span>$<span id="rateDisplay">0.00</span></span>
+                        </div>
+                        <div class="summary-item">
+                            <span id="nightsLabel">0 nights</span>
+                            <span>×</span>
+                            <span>$<span id="rateDisplay2">0.00</span></span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Subtotal</span>
+                            <span>$<span id="subtotalDisplay">0.00</span></span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Tax (10%)</span>
+                            <span>$<span id="taxDisplay">0.00</span></span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Service Fee</span>
+                            <span>$<span id="feeDisplay">5.00</span></span>
+                        </div>
+                        <div class="summary-item total">
+                            <span>Total</span>
+                            <span>$<span id="totalAmountDisplay">0.00</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        function checkAuthentication() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userEmail = localStorage.getItem('userEmail');
+            const authCheckAlert = document.getElementById('authCheckAlert');
+            const paymentContainer = document.getElementById('paymentContainer');
+
+            if (!isLoggedIn || !userEmail) {
+                authCheckAlert.style.display = 'block';
+                paymentContainer.style.display = 'none';
+                return false;
+            } else {
+                authCheckAlert.style.display = 'none';
+                paymentContainer.style.display = 'block';
+                loadPaymentData();
+                return true;
+            }
+        }
+
+        // Load payment data
+        function loadPaymentData() {
+            const bookingId = sessionStorage.getItem('selectedBookingId');
+            const lastBooking = JSON.parse(localStorage.getItem('lastBooking') || '{}');
+
+            if (Object.keys(lastBooking).length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('paymentForm').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('paymentForm').style.display = 'block';
+
+            // Parse dates
+            const checkinDate = new Date(lastBooking.checkin);
+            const checkoutDate = new Date(lastBooking.checkout);
+            const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+
+            // Display booking info
+            document.getElementById('roomNameDisplay').textContent = lastBooking.roomType;
+            document.getElementById('checkinDisplay').textContent = checkinDate.toLocaleDateString();
+            document.getElementById('checkoutDisplay').textContent = checkoutDate.toLocaleDateString();
+            document.getElementById('nightsDisplay').textContent = nights;
+            document.getElementById('guestsDisplay').textContent = lastBooking.guests + ' person' + (lastBooking.guests > 1 ? 's' : '');
+
+            // Calculate totals
+            const rate = lastBooking.rate;
+            const subtotal = nights * rate;
+            const tax = subtotal * 0.1;
+            const fee = 5.00;
+            const total = subtotal + tax + fee;
+
+            // Display amounts
+            document.getElementById('rateDisplay').textContent = rate.toFixed(2);
+            document.getElementById('rateDisplay2').textContent = rate.toFixed(2);
+            document.getElementById('nightsLabel').textContent = nights + ' night' + (nights > 1 ? 's' : '');
+            document.getElementById('subtotalDisplay').textContent = subtotal.toFixed(2);
+            document.getElementById('taxDisplay').textContent = tax.toFixed(2);
+            document.getElementById('totalAmountDisplay').textContent = total.toFixed(2);
+            document.getElementById('totalDisplay').textContent = total.toFixed(2);
+
+            // Pre-fill cardholder name
+            const userName = localStorage.getItem('userName') || '';
+            document.getElementById('cardholderName').value = userName;
+        }
+
+        // Format card number input
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+
+        // Format expiry date input
+        document.getElementById('expiryDate').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // Handle payment
+        function handlePayment(event) {
+            event.preventDefault();
+
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+
+            // Get form data
+            const cardholderName = document.getElementById('cardholderName').value;
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s+/g, '');
+            const expiryDate = document.getElementById('expiryDate').value;
+            const cvv = document.getElementById('cvv').value;
+            const billingAddress = document.getElementById('billingAddress').value;
+            const city = document.getElementById('city').value;
+            const zipCode = document.getElementById('zipCode').value;
+            const country = document.getElementById('country').value;
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+            // Validate card number (basic validation)
+            if (cardNumber.length !== 16) {
+                errorMessage.textContent = 'Please enter a valid 16-digit card number';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Validate expiry
+            if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+                errorMessage.textContent = 'Please enter expiry date in MM/YY format';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Validate CVV
+            if (cvv.length !== 3) {
+                errorMessage.textContent = 'Please enter a valid 3-digit CVV';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            const lastBooking = JSON.parse(localStorage.getItem('lastBooking'));
+            const checkinDate = new Date(lastBooking.checkin);
+            const checkoutDate = new Date(lastBooking.checkout);
+            const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+            const subtotal = nights * lastBooking.rate;
+            const tax = subtotal * 0.1;
+            const fee = 5.00;
+            const total = subtotal + tax + fee;
+
+            // Create payment record
+            const payment = {
+                id: 'PAY' + Date.now(),
+                bookingId: lastBooking.id || lastBooking.booking_id,
+                paymentMethod: paymentMethod,
+                cardholderName: cardholderName,
+                cardLastFour: cardNumber.substring(cardNumber.length - 4),
+                amount: total,
+                status: 'completed',
+                date: new Date().toLocaleString(),
+                billingAddress: billingAddress,
+                city: city,
+                zipCode: zipCode,
+                country: country
+            };
+
+            // Save payment to localStorage
+            let payments = JSON.parse(localStorage.getItem('payments') || '[]');
+            payments.push(payment);
+            localStorage.setItem('payments', JSON.stringify(payments));
+
+            // Update booking as paid
+            lastBooking.paid_status = 'paid';
+            lastBooking.paymentId = payment.id;
+            localStorage.setItem('lastBooking', JSON.stringify(lastBooking));
+
+            // Send to API
+            savePaymentToDatabase(payment, lastBooking);
+
+            // Show success
+            successMessage.innerHTML = `✓ Payment successful! Receipt ID: ${payment.id}`;
+            successMessage.classList.add('show');
+
+            // Reset form
+            document.querySelector('form').reset();
+
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'history.html';
+            }, 2000);
+        }
+
+        function savePaymentToDatabase(payment, booking) {
+            const paymentData = {
+                booking_id: payment.bookingId,
+                payment_method: payment.paymentMethod,
+                cardholder_name: payment.cardholderName,
+                card_last_four: payment.cardLastFour,
+                amount: payment.amount,
+                status: 'completed',
+                billing_address: payment.billingAddress,
+                city: payment.city,
+                zip_code: payment.zipCode,
+                country: payment.country,
+                user_email: localStorage.getItem('userEmail')
+            };
+
+            fetch('/api/payments/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(paymentData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Payment saved to database:', data);
+            })
+            .catch(error => {
+                console.log('Note: Backend API not available, using localStorage only:', error);
+            });
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userId');
+            window.location.href = 'index.html';
+        }
+
+        // Check auth on page load
+        checkAuthentication();
+    </script>
+</body>
+</html>

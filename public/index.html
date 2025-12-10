@@ -574,6 +574,22 @@
             flex-shrink: 0;
         }
 
+        .review-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ff6b35;
+            flex-shrink: 0;
+        }
+
+        .review-rating {
+            margin-top: 12px;
+            color: #ffc107;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
         .review-text {
             color: #ccc;
             font-size: 16px;
@@ -753,6 +769,8 @@
             </div>
             <div class="auth-buttons" id="userButtons" style="display: none; gap: 20px;">
                 <span id="userGreeting" style="color: #ccc; font-weight: 500;"></span>
+                <a href="history.html" style="color: #ccc; text-decoration: none; transition: color 0.3s;">📋 History</a>
+                <a href="payment.html" style="color: #ccc; text-decoration: none; transition: color 0.3s;">💳 Payment</a>
                 <a href="#" onclick="handleLogout(event)" class="btn-sign-in">Logout</a>
             </div>
         </div>
@@ -972,33 +990,36 @@
             <div class="reviews-grid">
                 <div class="review-card">
                     <div class="review-header">
-                        <div class="review-avatar">SJ</div>
+                        <img src="img/room1.jpg" alt="Sarah Johnson" class="review-photo">
                         <div class="review-author">
                             <h4>Sarah Johnson</h4>
                             <p>New York, USA</p>
                         </div>
                     </div>
                     <p class="review-text">"Amazing experience! The staff was incredibly helpful and the rooms are spotless. Will definitely come back!"</p>
+                    <div class="review-rating">⭐⭐⭐⭐⭐</div>
                 </div>
                 <div class="review-card">
                     <div class="review-header">
-                        <div class="review-avatar">MC</div>
+                        <img src="images/room2.jpg" alt="Michael Chen" class="review-photo">
                         <div class="review-author">
                             <h4>Michael Chen</h4>
                             <p>Tokyo, Japan</p>
                         </div>
                     </div>
                     <p class="review-text">"Best hotel I've stayed at. The amenities are world-class and the location is perfect for business."</p>
+                    <div class="review-rating">⭐⭐⭐⭐⭐</div>
                 </div>
                 <div class="review-card">
                     <div class="review-header">
-                        <div class="review-avatar">EW</div>
+                        <img src="images/room3.jpg" alt="Emma Williams" class="review-photo">
                         <div class="review-author">
                             <h4>Emma Williams</h4>
                             <p>London, UK</p>
                         </div>
                     </div>
                     <p class="review-text">"Exceptional service and beautiful views. The breakfast was delicious and the room was very clean."</p>
+                    <div class="review-rating">⭐⭐⭐⭐⭐</div>
                 </div>
             </div>
         </div>

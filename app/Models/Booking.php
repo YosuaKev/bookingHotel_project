@@ -24,6 +24,7 @@ class Booking extends Model
         'total',
         'booking_id',
         'status',
+        'paid_status',
         'special_requests'
     ];
 
@@ -40,5 +41,13 @@ class Booking extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the payments for this booking
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'booking_id', 'booking_id');
     }
 }
