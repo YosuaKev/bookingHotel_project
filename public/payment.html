@@ -814,7 +814,7 @@
             
             const checkinDate = new Date(checkinStr);
             const checkoutDate = new Date(checkoutStr);
-            const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+            const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)) || 1;
 
             // Display booking info
             document.getElementById('roomNameDisplay').textContent = booking.room_type || booking.roomType || 'Room';
@@ -823,36 +823,42 @@
             document.getElementById('nightsDisplay').textContent = nights;
             document.getElementById('guestsDisplay').textContent = booking.guests + ' person' + (booking.guests > 1 ? 's' : '');
 
-            // Use total from database if available, otherwise calculate from rate
-            let total;
+            // Calculate/determine amounts
+            let displayTotal = 0;
+            let subtotal = 0;
+            let tax = 0;
+            let rate = 0;
+
             if (booking.total) {
-                total = parseFloat(booking.total);
-            } else {
-                const rate = booking.rate || 0;
-                const subtotal = nights * rate;
-                const tax = subtotal * 0.1;
+                // Use total from database
+                displayTotal = parseFloat(booking.total);
+                // Calculate rate from total if available
+                rate = booking.rate ? parseFloat(booking.rate) : (displayTotal / nights);
+                subtotal = nights * rate;
+                tax = subtotal * 0.1;
+            } else if (booking.rate) {
+                // Calculate from rate
+                rate = parseFloat(booking.rate);
+                subtotal = nights * rate;
+                tax = subtotal * 0.1;
                 const fee = 5.00;
-                total = subtotal + tax + fee;
+                displayTotal = subtotal + tax + fee;
+            } else {
+                // No data available - show placeholders
+                rate = 0;
+                subtotal = 0;
+                tax = 0;
+                displayTotal = 0;
             }
 
-            // For display, break down the total
-            const rate = booking.rate || (booking.total / nights);
-            const subtotal = nights * rate;
-            const tax = subtotal * 0.1;
-            const fee = 5.00;
-            const calculatedTotal = subtotal + tax + fee;
-
-            // Use database total if available, otherwise use calculated
-            const displayTotal = booking.total ? parseFloat(booking.total) : calculatedTotal;
-
-            // Display amounts
-            document.getElementById('rateDisplay').textContent = rate.toFixed(2);
-            document.getElementById('rateDisplay2').textContent = rate.toFixed(2);
+            // Display amounts - safe formatting
+            document.getElementById('rateDisplay').textContent = parseFloat(rate).toFixed(2);
+            document.getElementById('rateDisplay2').textContent = parseFloat(rate).toFixed(2);
             document.getElementById('nightsLabel').textContent = nights + ' night' + (nights > 1 ? 's' : '');
-            document.getElementById('subtotalDisplay').textContent = subtotal.toFixed(2);
-            document.getElementById('taxDisplay').textContent = tax.toFixed(2);
-            document.getElementById('totalAmountDisplay').textContent = displayTotal.toFixed(2);
-            document.getElementById('totalDisplay').textContent = displayTotal.toFixed(2);
+            document.getElementById('subtotalDisplay').textContent = parseFloat(subtotal).toFixed(2);
+            document.getElementById('taxDisplay').textContent = parseFloat(tax).toFixed(2);
+            document.getElementById('totalAmountDisplay').textContent = parseFloat(displayTotal).toFixed(2);
+            document.getElementById('totalDisplay').textContent = parseFloat(displayTotal).toFixed(2);
 
             // Store current booking for payment processing
             window.currentBooking = booking;
