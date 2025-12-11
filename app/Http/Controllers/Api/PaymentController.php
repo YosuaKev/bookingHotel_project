@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Booking;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -49,9 +51,19 @@ class PaymentController extends Controller
             ]);
 
             // Update booking payment status
-            Booking::where('booking_id', $validated['booking_id'])->update([
-                'paid_status' => 'paid'
-            ]);
+            $booking = Booking::where('booking_id', $validated['booking_id'])->first();
+            if ($booking) {
+                $booking->paid_status = 'paid';
+                $booking->save();
+
+                // Create payment confirmation notification
+                if ($booking->user_id) {
+                    $user = User::find($booking->user_id);
+                    if ($user) {
+                        NotificationService::notifyPaymentConfirmation($payment, $user, $booking);
+                    }
+                }
+            }
 
             return response()->json([
                 'success' => true,

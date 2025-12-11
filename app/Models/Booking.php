@@ -50,4 +50,12 @@ class Booking extends Model
     {
         return $this->hasMany(Payment::class, 'booking_id', 'booking_id');
     }
+
+    /**
+     * Get the notifications for this booking
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

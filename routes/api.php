@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\NotificationController;
 
 // Public Auth Routes
 Route::post('/users/register', [AuthController::class, 'register']);
@@ -35,4 +36,11 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Protected Payment Routes
     Route::get('/my-payments', [PaymentController::class, 'userPayments']);
+    
+    // Protected Notification Routes
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -57,6 +58,11 @@ class BookingController extends Controller
                 'total' => $validated['total'],
                 'status' => 'confirmed'
             ]);
+
+            // Create notification instead of sending email
+            if ($user) {
+                NotificationService::notifyBookingConfirmation($booking, $user);
+            }
 
             return response()->json([
                 'success' => true,
