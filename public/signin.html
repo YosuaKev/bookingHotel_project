@@ -327,19 +327,28 @@
                 },
                 body: JSON.stringify({ email, password })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Login API error status:', response.status);
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Login API response:', data);
                 if (data.success && data.token) {
                     // Login successful with token from server
+                    console.log('Server login successful, token received');
                     loginSuccessful(data.user, data.token, 'server');
                 } else {
                     // Use local auth as fallback (no backend server available)
-                    console.log('Backend login not available, using local authentication');
+                    console.log('Backend login failed or no token, using local authentication');
                     loginSuccessful(localUser, null, 'local');
                 }
             })
             .catch(error => {
-                console.log('Backend unavailable, using local authentication:', error);
+                console.error('Backend login error:', error.message);
+                console.log('Falling back to local authentication');
                 loginSuccessful(localUser, null, 'local');
             });
         }

@@ -895,7 +895,7 @@
             // Create payment record
             const payment = {
                 id: 'PAY' + Date.now(),
-                bookingId: lastBooking.id || lastBooking.booking_id,
+                bookingId: lastBooking.booking_id || lastBooking.id,
                 paymentMethod: paymentMethod,
                 cardholderName: cardholderName,
                 cardLastFour: cardNumber.substring(cardNumber.length - 4),
@@ -908,30 +908,17 @@
                 country: country
             };
 
-            // Save payment to localStorage
-            let payments = JSON.parse(localStorage.getItem('payments') || '[]');
-            payments.push(payment);
-            localStorage.setItem('payments', JSON.stringify(payments));
-
-            // Update booking as paid
-            lastBooking.paid_status = 'paid';
-            lastBooking.paymentId = payment.id;
-            localStorage.setItem('lastBooking', JSON.stringify(lastBooking));
-
-            // Send to API
+            // Send to API FIRST (don't save to localStorage yet)
             savePaymentToDatabase(payment, lastBooking);
 
-            // Show success
-            successMessage.innerHTML = `✓ Payment successful! Receipt ID: ${payment.id}`;
+            // Show success (but this is optimistic - real success is when API responds)
+            successMessage.innerHTML = `✓ Processing payment...`;
             successMessage.classList.add('show');
 
             // Reset form
             document.querySelector('form').reset();
 
-            // Redirect after 2 seconds
-            setTimeout(() => {
-                window.location.href = 'history.html';
-            }, 2000);
+            // Redirect after payment API response (handled in savePaymentToDatabase)
         }
 
         function savePaymentToDatabase(payment, booking) {
@@ -956,7 +943,13 @@
 
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
+                console.log('Adding Authorization header with token');
+            } else {
+                console.warn('No auth token found in localStorage!');
             }
+
+            console.log('Sending payment data:', paymentData);
+            console.log('Headers:', headers);
 
             fetch('/api/payments/create', {
                 method: 'POST',
@@ -964,8 +957,9 @@
                 body: JSON.stringify(paymentData)
             })
             .then(response => {
+                console.log('Payment API response status:', response.status);
                 if (!response.ok) {
-                    console.log('Response status:', response.status);
+                    console.error('Payment API error:', response.status, response.statusText);
                     return response.json().then(error => {
                         throw new Error(JSON.stringify(error));
                     });
@@ -973,20 +967,44 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Payment saved to database:', data);
-                // Update booking with payment info
-                if (data.transaction_id) {
-                    const updatedBooking = {
-                        ...booking,
-                        paymentId: data.payment.id,
-                        transactionId: data.transaction_id,
-                        paidStatus: 'paid'
-                    };
-                    localStorage.setItem('lastBooking', JSON.stringify(updatedBooking));
+                console.log('Payment API success response:', data);
+                if (data.success) {
+                    console.log('✓ Payment saved to database:', data);
+                    
+                    // ONLY SAVE TO LOCALSTORAGE AFTER SUCCESSFUL API RESPONSE
+                    let payments = JSON.parse(localStorage.getItem('payments') || '[]');
+                    payments.push(payment);
+                    localStorage.setItem('payments', JSON.stringify(payments));
+
+                    // Update booking as paid
+                    booking.paid_status = 'paid';
+                    booking.paymentId = payment.id;
+                    booking.transactionId = data.transaction_id;
+                    localStorage.setItem('lastBooking', JSON.stringify(booking));
+                    
+                    console.log('✓ localStorage updated successfully');
+                    
+                    // Show success message
+                    const successMessage = document.getElementById('successMessage');
+                    successMessage.innerHTML = `✓ Payment successful! Transaction ID: ${data.transaction_id}`;
+                    successMessage.classList.add('show');
+                    
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'history.html';
+                    }, 2000);
+                } else {
+                    console.error('Payment save failed:', data.message || 'Unknown error');
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorMessage.textContent = data.message || 'Payment processing failed';
+                    errorMessage.classList.add('show');
                 }
             })
             .catch(error => {
-                console.log('Payment save note:', error.message);
+                console.error('Payment save error:', error.message);
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Error: ' + error.message;
+                errorMessage.classList.add('show');
             });
         }
 

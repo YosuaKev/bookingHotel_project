@@ -705,7 +705,13 @@
             // Add authorization header if token exists
             if (authToken) {
                 headers['Authorization'] = 'Bearer ' + authToken;
+                console.log('Adding Authorization header with token');
+            } else {
+                console.warn('No auth token found in localStorage!');
             }
+
+            console.log('Sending booking data:', bookingData);
+            console.log('Headers:', headers);
 
             // Send booking data to backend API
             fetch('/api/bookings/create', {
@@ -713,20 +719,32 @@
                 headers: headers,
                 body: JSON.stringify(bookingData)
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Booking API response status:', response.status);
+                if (!response.ok) {
+                    console.error('Booking API error:', response.status, response.statusText);
+                    return response.json().then(err => {
+                        throw new Error(JSON.stringify(err));
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Booking API success response:', data);
                 if (data.success) {
-                    console.log('Booking saved to database:', data);
-                    // Store booking ID in localStorage for reference
-                    if (data.booking && data.booking.id) {
-                        localStorage.setItem('lastBookingId', data.booking.id);
+                    console.log('✓ Booking saved to database:', data);
+                    // Update localStorage with the complete booking data from API response
+                    if (data.booking) {
+                        localStorage.setItem('lastBooking', JSON.stringify(data.booking));
+                        localStorage.setItem('lastBookingId', data.booking.booking_id || data.booking.id);
+                        console.log('Updated localStorage with booking data from API');
                     }
                 } else {
-                    console.log('Booking API response:', data);
+                    console.error('Booking save failed:', data.message || 'Unknown error');
                 }
             })
             .catch(error => {
-                console.log('Note: Backend API not available, using localStorage only:', error);
+                console.error('Booking save error:', error.message);
             });
         }
 
