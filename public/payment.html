@@ -948,7 +948,7 @@
             };
 
             // Send to API FIRST (don't save to localStorage yet)
-            savePaymentToDatabase(payment, lastBooking);
+            savePaymentToDatabase(payment, booking);
 
             // Show success (but this is optimistic - real success is when API responds)
             successMessage.innerHTML = `✓ Processing payment...`;
