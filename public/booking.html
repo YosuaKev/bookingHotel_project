@@ -657,94 +657,93 @@
 
             // Store booking in localStorage
             const booking = {
+                bookingId: 'BK' + Date.now(),
                 id: 'BK' + Date.now(),
                 firstName,
                 lastName,
                 email,
                 phone,
-                roomType: roomNames[roomType],
+                roomType,
                 checkin: checkinDateTime,
                 checkout: checkoutDateTime,
                 guests,
                 nights,
                 rate,
                 total,
+                specialRequests: document.getElementById('specialRequests')?.value || '',
                 date: new Date().toLocaleString()
             };
 
             localStorage.setItem('lastBooking', JSON.stringify(booking));
 
-            // Save booking to database
+            // Save booking to database (no email sent, notification only)
             saveBookingToDatabase(booking);
 
             // Show success message
-            successMessage.innerHTML = `✓ Booking confirmed! Confirmation sent to ${email}. Your booking ID is: ${booking.id}`;
+            successMessage.innerHTML = `✓ Booking confirmed! Your booking ID is: ${booking.bookingId}`;
             successMessage.classList.add('show');
 
             // Redirect after 2 seconds
             setTimeout(() => {
-                alert(`Thank you for booking!\n\nBooking ID: ${booking.id}\nRoom: ${roomNames[roomType]}\nTotal: $${total.toFixed(2)}\n\nConfirmation email sent to ${email}`);
+                alert(`Thank you for booking!\n\nBooking ID: ${booking.bookingId}\nRoom: ${roomNames[roomType]}\nTotal: $${total.toFixed(2)}\n\nNotification saved to your account.`);
                 window.location.href = 'index.html';
             }, 2000);
         }
 
-        function saveBookingToDatabase(booking) {
-            // Add user info to booking
+       function saveBookingToDatabase(booking) {
             const bookingData = {
-                ...booking,
-                userEmail: localStorage.getItem('userEmail'),
-                userId: localStorage.getItem('userId')
+                bookingId: booking.bookingId,
+                firstName: booking.firstName,
+                lastName: booking.lastName,
+                email: booking.email,
+                phone: booking.phone,
+                roomType: booking.roomType,
+                checkin: booking.checkin,
+                checkout: booking.checkout,
+                guests: booking.guests,
+                nights: booking.nights,
+                rate: booking.rate,
+                total: booking.total,
+                specialRequests: booking.specialRequests || '',
+                userEmail: localStorage.getItem('userEmail') || null
             };
 
-            // Get auth token
+            const headers = { 'Content-Type': 'application/json' };
+
+            // Optional: auth token jika middleware auth digunakan
             const authToken = localStorage.getItem('authToken');
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-            
-            // Add authorization header if token exists
-            if (authToken) {
-                headers['Authorization'] = 'Bearer ' + authToken;
-                console.log('Adding Authorization header with token');
-            } else {
-                console.warn('No auth token found in localStorage!');
-            }
+            if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
 
-            console.log('Sending booking data:', bookingData);
-            console.log('Headers:', headers);
+            console.log('Sending booking data to API:', bookingData);
 
-            // Send booking data to backend API
-            fetch('/api/bookings/create', {
+            fetch('/api/booking', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify(bookingData)
             })
-            .then(response => {
-                console.log('Booking API response status:', response.status);
-                if (!response.ok) {
-                    console.error('Booking API error:', response.status, response.statusText);
-                    return response.json().then(err => {
-                        throw new Error(JSON.stringify(err));
-                    });
-                }
-                return response.json();
+            .then(res => {
+                console.log('API response status:', res.status);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
             })
             .then(data => {
-                console.log('Booking API success response:', data);
-                if (data.success) {
-                    console.log('✓ Booking saved to database:', data);
-                    // Update localStorage with the complete booking data from API response
-                    if (data.booking) {
-                        localStorage.setItem('lastBooking', JSON.stringify(data.booking));
-                        localStorage.setItem('lastBookingId', data.booking.booking_id || data.booking.id);
-                        console.log('Updated localStorage with booking data from API');
-                    }
+                if (data.success && data.booking) {
+                    console.log('✓ Booking saved to database:', data.booking);
+                    // Update localStorage with API response (includes booking_id from database)
+                    localStorage.setItem('lastBooking', JSON.stringify(data.booking));
+                    localStorage.setItem('lastBookingId', data.booking.booking_id || data.booking.id);
+                    console.log('✓ localStorage updated with database booking');
                 } else {
-                    console.error('Booking save failed:', data.message || 'Unknown error');
+                    console.error('Booking save failed:', data.message);
                 }
             })
-            .catch(error => {
-                console.error('Booking save error:', error.message);
+            .catch(err => {
+                console.error('Booking API error:', err);
+                const errorDiv = document.getElementById('errorMessage');
+                if (errorDiv) {
+                    errorDiv.textContent = 'Error saving booking: ' + err.message;
+                    errorDiv.classList.add('show');
+                }
             });
         }
 

@@ -11,6 +11,7 @@ class Booking extends Model
 
     protected $fillable = [
         'user_id',
+        'booking_id',
         'first_name',
         'last_name',
         'email',
@@ -22,9 +23,7 @@ class Booking extends Model
         'nights',
         'rate',
         'total',
-        'booking_id',
         'status',
-        'paid_status',
         'special_requests'
     ];
 
@@ -35,25 +34,16 @@ class Booking extends Model
         'rate' => 'decimal:2'
     ];
 
-    /**
-     * Get the user that owns the booking
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the payments for this booking
-     */
     public function payments()
     {
         return $this->hasMany(Payment::class, 'booking_id', 'booking_id');
     }
 
-    /**
-     * Get the notifications for this booking
-     */
     public function notifications()
     {
         return $this->hasMany(Notification::class);

@@ -11,55 +11,53 @@ use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
-    /**
-     * Store a newly created booking in database
-     */
+    // Simpan booking baru
     public function store(Request $request)
     {
-        // Validate incoming data
         $validated = $request->validate([
-            'id' => 'required|string',
-            'firstName' => 'required|string|max:255',
-            'lastName' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'roomType' => 'required|string',
-            'checkin' => 'required|string',
-            'checkout' => 'required|string|after:checkin',
-            'guests' => 'required|integer|min:1|max:10',
-            'nights' => 'required|integer|min:1',
-            'rate' => 'required|numeric|min:0',
-            'total' => 'required|numeric|min:0',
-            'userEmail' => 'email|nullable',
-            'userId' => 'integer|nullable'
+            'bookingId'   => 'required|string|max:255',
+            'firstName'   => 'required|string|max:255',
+            'lastName'    => 'required|string|max:255',
+            'email'       => 'required|email|max:255',
+            'phone'       => 'required|string|max:20',
+            'roomType'    => 'required|string',
+            'checkin'     => 'required|date',
+            'checkout'    => 'required|date|after:checkin',
+            'guests'      => 'required|integer|min:1|max:10',
+            'nights'      => 'required|integer|min:1',
+            'rate'        => 'required|numeric|min:0',
+            'total'       => 'required|numeric|min:0',
+            'specialRequests' => 'nullable|string',
+            'userEmail'   => 'nullable|email'
         ]);
 
         try {
-            // Find user by email if provided
+            // Cari user jika email ada
             $user = null;
-            if ($validated['userEmail']) {
+            if (!empty($validated['userEmail'])) {
                 $user = User::where('email', $validated['userEmail'])->first();
             }
 
-            // Create booking record
+            // Simpan booking
             $booking = Booking::create([
-                'user_id' => $user ? $user->id : null,
-                'booking_id' => $validated['id'],
-                'first_name' => $validated['firstName'],
-                'last_name' => $validated['lastName'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'room_type' => $validated['roomType'],
-                'check_in' => $validated['checkin'],
-                'check_out' => $validated['checkout'],
-                'guests' => $validated['guests'],
-                'nights' => $validated['nights'],
-                'rate' => $validated['rate'],
-                'total' => $validated['total'],
-                'status' => 'confirmed'
+                'user_id'          => $user ? $user->id : null,
+                'booking_id'       => $validated['bookingId'],
+                'first_name'       => $validated['firstName'],
+                'last_name'        => $validated['lastName'],
+                'email'            => $validated['email'],
+                'phone'            => $validated['phone'],
+                'room_type'        => $validated['roomType'],
+                'check_in'         => $validated['checkin'],
+                'check_out'        => $validated['checkout'],
+                'guests'           => $validated['guests'],
+                'nights'           => $validated['nights'],
+                'rate'             => $validated['rate'],
+                'total'            => $validated['total'],
+                'status'           => 'confirmed',
+                'special_requests' => $validated['specialRequests'] ?? null
             ]);
 
-            // Create notification instead of sending email
+            // Notifikasi (opsional)
             if ($user) {
                 NotificationService::notifyBookingConfirmation($booking, $user);
             }
@@ -78,47 +76,27 @@ class BookingController extends Controller
         }
     }
 
-    /**
-     * Get all bookings for the authenticated user
-     */
+    // Booking user (auth)
     public function userBookings()
     {
         $user = Auth::user();
-
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized'
-            ], 401);
+            return response()->json(['success'=>false,'message'=>'Unauthorized'], 401);
         }
 
         $bookings = Booking::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->orderBy('created_at','desc')->get();
 
-        return response()->json([
-            'success' => true,
-            'bookings' => $bookings
-        ]);
+        return response()->json(['success'=>true,'bookings'=>$bookings]);
     }
 
-    /**
-     * Get a specific booking
-     */
+    // Tampilkan booking spesifik
     public function show($bookingId)
     {
-        $booking = Booking::where('booking_id', $bookingId)->first();
-
+        $booking = Booking::where('booking_id',$bookingId)->first();
         if (!$booking) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Booking not found'
-            ], 404);
+            return response()->json(['success'=>false,'message'=>'Booking not found'],404);
         }
-
-        return response()->json([
-            'success' => true,
-            'booking' => $booking
-        ]);
+        return response()->json(['success'=>true,'booking'=>$booking]);
     }
 }
