@@ -18,11 +18,11 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'booking_id' => 'required|string',
-            'payment_method' => 'required|string|in:credit_card,debit_card,bank_transfer',
+            'payment_method' => 'required|string',
             'cardholder_name' => 'required|string|max:255',
-            'card_last_four' => 'required|string|size:4',
+            'card_last_four' => 'required|string',
             'amount' => 'required|numeric|min:0',
-            'status' => 'required|string|in:pending,completed,failed',
+            'status' => 'required|string',
             'billing_address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'zip_code' => 'required|string|max:20',
@@ -50,7 +50,7 @@ class PaymentController extends Controller
                 'transaction_id' => $transactionId
             ]);
 
-            // Update booking payment status
+            // Try to update booking payment status
             $booking = Booking::where('booking_id', $validated['booking_id'])->first();
             if ($booking) {
                 $booking->paid_status = 'paid';
