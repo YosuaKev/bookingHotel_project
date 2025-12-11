@@ -739,27 +739,40 @@
 
         // Load payment data
         function loadPaymentData() {
-            // Try to fetch from API first
             const token = localStorage.getItem('authToken');
+            const userEmail = localStorage.getItem('userEmail');
             
-            fetch(`/api/my-payments`, {
+            if (!token) {
+                console.log('No auth token, using localStorage');
+                loadPaymentFromLocalStorage();
+                return;
+            }
+
+            // Fetch user's bookings from API
+            fetch(`/api/my_bookings`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` || ''
+                    'Authorization': `Bearer ${token}`
                 }
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success && data.payments && data.payments.length > 0) {
-                    displayPayments(data.payments);
+                console.log('Bookings API response:', data);
+                if (data.success && data.bookings && data.bookings.length > 0) {
+                    // Get the most recent unpaid booking
+                    const unpaidBooking = data.bookings.find(b => b.paid_status !== 'paid') || data.bookings[0];
+                    console.log('Selected booking for payment:', unpaidBooking);
+                    displayPaymentDetails(unpaidBooking);
                 } else {
                     // Fallback to localStorage
+                    console.log('No bookings from API, using localStorage');
                     loadPaymentFromLocalStorage();
                 }
             })
             .catch(error => {
-                console.log('API not available, using localStorage');
+                console.error('API error:', error);
+                console.log('Falling back to localStorage');
                 loadPaymentFromLocalStorage();
             });
         }
@@ -778,39 +791,59 @@
         }
 
         function displayPayments(payments) {
-            // If user has payments, display the last one or create form for new payment
-            if (payments.length > 0) {
+            // For backward compatibility - if still called with payments array
+            if (payments && payments.length > 0) {
                 const lastPayment = payments[payments.length - 1];
                 if (lastPayment.booking) {
                     displayPaymentDetails(lastPayment.booking);
+                } else {
+                    displayPaymentDetails(lastPayment);
                 }
             } else {
                 loadPaymentFromLocalStorage();
             }
         }
 
-        function displayPaymentDetails(lastBooking) {
+        function displayPaymentDetails(booking) {
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('paymentForm').style.display = 'block';
 
-            // Parse dates
-            const checkinDate = new Date(lastBooking.checkin);
-            const checkoutDate = new Date(lastBooking.checkout);
+            // Use database field names (check_in, check_out) or fallback to form field names (checkin, checkout)
+            const checkinStr = booking.check_in || booking.checkin;
+            const checkoutStr = booking.check_out || booking.checkout;
+            
+            const checkinDate = new Date(checkinStr);
+            const checkoutDate = new Date(checkoutStr);
             const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
 
             // Display booking info
-            document.getElementById('roomNameDisplay').textContent = lastBooking.roomType;
+            document.getElementById('roomNameDisplay').textContent = booking.room_type || booking.roomType || 'Room';
             document.getElementById('checkinDisplay').textContent = checkinDate.toLocaleDateString();
             document.getElementById('checkoutDisplay').textContent = checkoutDate.toLocaleDateString();
             document.getElementById('nightsDisplay').textContent = nights;
-            document.getElementById('guestsDisplay').textContent = lastBooking.guests + ' person' + (lastBooking.guests > 1 ? 's' : '');
+            document.getElementById('guestsDisplay').textContent = booking.guests + ' person' + (booking.guests > 1 ? 's' : '');
 
-            // Calculate totals
-            const rate = lastBooking.rate;
+            // Use total from database if available, otherwise calculate from rate
+            let total;
+            if (booking.total) {
+                total = parseFloat(booking.total);
+            } else {
+                const rate = booking.rate || 0;
+                const subtotal = nights * rate;
+                const tax = subtotal * 0.1;
+                const fee = 5.00;
+                total = subtotal + tax + fee;
+            }
+
+            // For display, break down the total
+            const rate = booking.rate || (booking.total / nights);
             const subtotal = nights * rate;
             const tax = subtotal * 0.1;
             const fee = 5.00;
-            const total = subtotal + tax + fee;
+            const calculatedTotal = subtotal + tax + fee;
+
+            // Use database total if available, otherwise use calculated
+            const displayTotal = booking.total ? parseFloat(booking.total) : calculatedTotal;
 
             // Display amounts
             document.getElementById('rateDisplay').textContent = rate.toFixed(2);
@@ -818,11 +851,17 @@
             document.getElementById('nightsLabel').textContent = nights + ' night' + (nights > 1 ? 's' : '');
             document.getElementById('subtotalDisplay').textContent = subtotal.toFixed(2);
             document.getElementById('taxDisplay').textContent = tax.toFixed(2);
-            document.getElementById('totalAmountDisplay').textContent = total.toFixed(2);
-            document.getElementById('totalDisplay').textContent = total.toFixed(2);
+            document.getElementById('totalAmountDisplay').textContent = displayTotal.toFixed(2);
+            document.getElementById('totalDisplay').textContent = displayTotal.toFixed(2);
 
-            // Pre-fill cardholder name
-            const userName = localStorage.getItem('userName') || '';
+            // Store current booking for payment processing
+            window.currentBooking = booking;
+            window.currentBookingTotal = displayTotal;
+
+            // Pre-fill cardholder name from booking
+            const userName = booking.first_name && booking.last_name 
+                ? booking.first_name + ' ' + booking.last_name 
+                : localStorage.getItem('userName') || '';
             document.getElementById('cardholderName').value = userName;
         }
 
@@ -883,19 +922,13 @@
                 return;
             }
 
-            const lastBooking = JSON.parse(localStorage.getItem('lastBooking'));
-            const checkinDate = new Date(lastBooking.checkin);
-            const checkoutDate = new Date(lastBooking.checkout);
-            const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
-            const subtotal = nights * lastBooking.rate;
-            const tax = subtotal * 0.1;
-            const fee = 5.00;
-            const total = subtotal + tax + fee;
+            const booking = window.currentBooking || JSON.parse(localStorage.getItem('lastBooking'));
+            const total = window.currentBookingTotal;
 
             // Create payment record
             const payment = {
                 id: 'PAY' + Date.now(),
-                bookingId: lastBooking.booking_id || lastBooking.id,
+                bookingId: booking.booking_id || booking.id,
                 paymentMethod: paymentMethod,
                 cardholderName: cardholderName,
                 cardLastFour: cardNumber.substring(cardNumber.length - 4),
