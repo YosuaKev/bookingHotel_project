@@ -99,4 +99,91 @@ class BookingController extends Controller
         }
         return response()->json(['success'=>true,'booking'=>$booking]);
     }
+
+    // Cancel booking dengan refund
+    public function cancel(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|string|exists:bookings,booking_id'
+        ]);
+
+        $user = Auth::user();
+        $booking = Booking::where('booking_id', $request->booking_id)->first();
+
+        // Verify ownership
+        if ($booking->user_id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        // Check if booking can be cancelled
+        if (in_array($booking->status, ['cancelled', 'completed'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This booking cannot be cancelled'
+            ], 422);
+        }
+
+        // Calculate refund (100% for now, can be modified for cancellation policies)
+        $refundAmount = $booking->total;
+        $daysUntilCheckIn = now()->diffInDays(new \DateTime($booking->check_in));
+
+        // Apply cancellation policy: 50% refund if within 7 days
+        if ($daysUntilCheckIn <= 7) {
+            $refundAmount = $booking->total * 0.5;
+        }
+
+        // Update booking status
+        $booking->update([
+            'status' => 'cancelled',
+            'refund_amount' => $refundAmount,
+            'cancelled_at' => now(),
+        ]);
+
+        // Create refund notification
+        if ($user) {
+            NotificationService::notifyBookingCancellation($booking, $user, $refundAmount);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Booking cancelled successfully',
+            'refund_amount' => $refundAmount,
+            'booking' => $booking
+        ]);
+    }
+
+    // Get available dates for a room
+    public function getRoomAvailability(Request $request)
+    {
+        $request->validate([
+            'room_type' => 'required|string',
+            'check_in' => 'required|date|after_or_equal:today',
+            'check_out' => 'required|date|after:check_in',
+        ]);
+
+        // Check if room is available for the given dates
+        $booking = Booking::where('room_type', $request->room_type)
+            ->where('status', '!=', 'cancelled')
+            ->where('paid_status', 'paid')
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('check_in', [$request->check_in, $request->check_out])
+                    ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('check_in', '<=', $request->check_in)
+                          ->where('check_out', '>=', $request->check_out);
+                    });
+            })
+            ->exists();
+
+        return response()->json([
+            'success' => true,
+            'available' => !$booking,
+            'room_type' => $request->room_type,
+            'check_in' => $request->check_in,
+            'check_out' => $request->check_out,
+        ]);
+    }
 }

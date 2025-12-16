@@ -143,4 +143,115 @@ class PaymentController extends Controller
             'payment' => $payment
         ]);
     }
+
+    /**
+     * Upload payment proof
+     */
+    public function uploadProof(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|string|exists:bookings,booking_id',
+            'proof' => 'required|file|image|max:5120', // 5MB
+        ]);
+
+        $user = auth()->user();
+        $booking = Booking::where('booking_id', $request->booking_id)->first();
+
+        // Verify ownership
+        if ($booking->user_id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        try {
+            // Store the proof file
+            $path = $request->file('proof')->store('payment-proofs', 'public');
+
+            // Create payment record with proof
+            $payment = Payment::create([
+                'booking_id' => $request->booking_id,
+                'payment_method' => 'bank_transfer',
+                'status' => 'pending_verification',
+                'proof_file' => $path,
+                'user_email' => $user->email,
+                'amount' => $booking->total,
+            ]);
+
+            // Send notification
+            NotificationService::notifyPaymentProofReceived($payment, $user, $booking);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment proof uploaded successfully',
+                'payment' => [
+                    'id' => $payment->id,
+                    'status' => $payment->status,
+                    'proof_url' => asset('storage/' . $path),
+                ]
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Upload failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Admin: Verify payment proof
+     */
+    public function verifyProof(Request $request)
+    {
+        if (!auth()->user() || auth()->user()->usertype !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Admin access required'
+            ], 403);
+        }
+
+        $request->validate([
+            'payment_id' => 'required|integer|exists:payments,id',
+            'verified' => 'required|boolean',
+            'comment' => 'nullable|string',
+        ]);
+
+        $payment = Payment::findOrFail($request->payment_id);
+        $booking = Booking::where('booking_id', $payment->booking_id)->first();
+
+        if ($request->verified) {
+            $payment->update([
+                'status' => 'verified',
+                'verified_at' => now(),
+                'verified_comment' => $request->comment,
+            ]);
+
+            if ($booking) {
+                $booking->update(['paid_status' => 'paid']);
+            }
+
+            // Notify user of verification
+            if ($booking && $booking->user) {
+                NotificationService::notifyPaymentVerified($payment, $booking->user, $booking);
+            }
+        } else {
+            $payment->update([
+                'status' => 'rejected',
+                'verified_comment' => $request->comment,
+            ]);
+
+            // Notify user of rejection
+            if ($booking && $booking->user) {
+                NotificationService::notifyPaymentRejected($payment, $booking->user, $booking);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment ' . ($request->verified ? 'verified' : 'rejected') . ' successfully',
+            'payment' => $payment
+        ]);
+    }
 }

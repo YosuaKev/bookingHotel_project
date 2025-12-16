@@ -21,11 +21,15 @@ class Payment extends Model
         'zip_code',
         'country',
         'user_email',
-        'transaction_id'
+        'transaction_id',
+        'proof_file',
+        'verified_at',
+        'verified_comment',
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2'
+        'amount' => 'decimal:2',
+        'verified_at' => 'datetime',
     ];
 
     /**

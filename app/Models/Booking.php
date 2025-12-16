@@ -24,14 +24,19 @@ class Booking extends Model
         'rate',
         'total',
         'status',
-        'special_requests'
+        'special_requests',
+        'paid_status',
+        'refund_amount',
+        'cancelled_at',
     ];
 
     protected $casts = [
         'check_in' => 'datetime',
         'check_out' => 'datetime',
         'total' => 'decimal:2',
-        'rate' => 'decimal:2'
+        'rate' => 'decimal:2',
+        'refund_amount' => 'decimal:2',
+        'cancelled_at' => 'datetime',
     ];
 
     public function user()
@@ -48,4 +53,10 @@ class Booking extends Model
     {
         return $this->hasMany(Notification::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+}
 }
