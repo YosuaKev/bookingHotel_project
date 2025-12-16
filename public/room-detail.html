@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1f">
+    <title>Room Details - LUXORA Hotel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1f;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: rgba(26, 26, 31, 0.98);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6b35;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+
+        .nav-link {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            margin-left: 30px;
+        }
+
+        .nav-link:hover {
+            color: #ff6b35;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .room-detail {
+            background-color: #252530;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #333;
+            margin-bottom: 40px;
+        }
+
+        .room-gallery {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            background-color: #1a1a1f;
+        }
+
+        .room-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .room-header {
+            padding: 30px;
+            border-bottom: 1px solid #333;
+        }
+
+        .room-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            color: #ffc107;
+            font-size: 18px;
+        }
+
+        .rating-count {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .room-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .room-description {
+            color: #ccc;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .amenities {
+            margin-bottom: 30px;
+        }
+
+        .amenities h3 {
+            margin-bottom: 15px;
+            color: #ff6b35;
+        }
+
+        .amenity-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .amenity-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: #1a1a1f;
+            border-radius: 8px;
+            border-left: 3px solid #ff6b35;
+        }
+
+        .amenity-item strong {
+            color: #fff;
+        }
+
+        .side-panel {
+            background-color: #1a1a1f;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            height: fit-content;
+        }
+
+        .price {
+            font-size: 32px;
+            color: #ff6b35;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .price-note {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background-color: #ff6b35;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #e55a24;
+            transform: translateY(-2px);
+        }
+
+        .availability-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+        }
+
+        .availability-section h3 {
+            margin-bottom: 15px;
+            color: #ff6b35;
+        }
+
+        .date-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="date"] {
+            padding: 10px;
+            background-color: #252530;
+            border: 1px solid #333;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .availability-result {
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .availability-result.available {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .availability-result.unavailable {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .reviews-section {
+            margin-top: 60px;
+            padding: 30px;
+            background-color: #252530;
+            border-radius: 15px;
+            border: 1px solid #333;
+        }
+
+        .reviews-section h2 {
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .review-card {
+            background-color: #1a1a1f;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b35;
+            margin-bottom: 20px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .review-author {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .review-date {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .review-rating {
+            color: #ffc107;
+            margin-bottom: 10px;
+        }
+
+        .review-comment {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .no-reviews {
+            text-align: center;
+            color: #aaa;
+            padding: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #ff6b35;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .room-gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .room-content {
+                grid-template-columns: 1fr;
+            }
+
+            .amenity-list {
+                grid-template-columns: 1fr;
+            }
+
+            .date-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .room-header h1 {
+                font-size: 24px;
+            }
+
+            .price {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">LUXORA</a>
+            <nav>
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#rooms" class="nav-link">Rooms</a>
+                <a href="booking.html" class="nav-link">Book Now</a>
+                <a href="profile.html" class="nav-link">My Profile</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="loading" class="loading">Loading room details...</div>
+        <div id="content" style="display: none;">
+            <!-- Room Detail -->
+            <div class="room-detail">
+                <div class="room-gallery">
+                    <img id="mainImage" src="" alt="Room" class="main-image">
+                    <div class="room-info">
+                        <div class="room-header" style="border: none; padding: 0;">
+                            <h1 id="roomTitle"></h1>
+                            <div class="rating">
+                                <div class="stars" id="ratingStars"></div>
+                                <span class="rating-count" id="reviewCount"></span>
+                            </div>
+                        </div>
+                        <div style="background-color: #1a1a1f; padding: 15px; border-radius: 8px;">
+                            <strong>Room Type:</strong> <span id="roomType"></span><br><br>
+                            <strong>Capacity:</strong> <span id="capacity"></span> guests<br><br>
+                            <strong>Amenities:</strong><br>
+                            <ul id="quickAmenities" style="margin-left: 15px; margin-top: 10px;"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="room-content">
+                <div>
+                    <h2 style="margin-bottom: 20px;">About This Room</h2>
+                    <p class="room-description" id="description"></p>
+
+                    <div class="amenities">
+                        <h3>Room Features</h3>
+                        <div class="amenity-list">
+                            <div class="amenity-item">
+                                <strong>WiFi:</strong> <span id="wifi"></span>
+                            </div>
+                            <div class="amenity-item">
+                                <strong>AC:</strong> <span id="ac"></span>
+                            </div>
+                            <div class="amenity-item">
+                                <strong>TV:</strong> <span id="tv"></span>
+                            </div>
+                            <div class="amenity-item">
+                                <strong>Bathroom:</strong> <span id="bathroom"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Panel -->
+                <div class="side-panel">
+                    <div class="price" id="price"></div>
+                    <p class="price-note">per night</p>
+
+                    <button class="btn btn-primary" onclick="goToBooking()">Book This Room</button>
+
+                    <div class="availability-section">
+                        <h3>Check Availability</h3>
+                        <div class="date-inputs">
+                            <input type="date" id="checkInDate" min="">
+                            <input type="date" id="checkOutDate" min="">
+                        </div>
+                        <button class="btn btn-primary" onclick="checkAvailability()">Check Dates</button>
+                        <div id="availabilityResult" class="availability-result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="reviews-section">
+                <h2>Guest Reviews</h2>
+                <div id="reviewsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        const roomId = new URLSearchParams(window.location.search).get('id');
+
+        if (!roomId) {
+            document.getElementById('loading').textContent = 'No room selected';
+            document.getElementById('loading').style.display = 'block';
+        } else {
+            loadRoomDetails();
+        }
+
+        async function loadRoomDetails() {
+            try {
+                const response = await fetch(`${API_BASE}/rooms/${roomId}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    document.getElementById('loading').textContent = 'Room not found';
+                    return;
+                }
+
+                const room = data.data;
+                displayRoom(room);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading room:', error);
+                document.getElementById('loading').textContent = 'Error loading room details';
+            }
+        }
+
+        function displayRoom(room) {
+            // Basic info
+            document.getElementById('mainImage').src = room.image ? `/storage/${room.image}` : '/images/room-placeholder.jpg';
+            document.getElementById('roomTitle').textContent = room.room_title;
+            document.getElementById('roomType').textContent = room.room_type;
+            document.getElementById('capacity').textContent = room.capacity;
+            document.getElementById('description').textContent = room.description;
+            document.getElementById('price').textContent = `$${parseFloat(room.price).toFixed(2)}`;
+
+            // Features
+            document.getElementById('wifi').textContent = room.wifi ? '✓ Yes' : '✗ No';
+            document.getElementById('ac').textContent = room.air_conditioning ? '✓ Yes' : '✗ No';
+            document.getElementById('tv').textContent = room.tv ? '✓ Yes' : '✗ No';
+            document.getElementById('bathroom').textContent = room.bathroom_type || 'Private';
+
+            // Quick amenities
+            if (room.amenities && room.amenities.length > 0) {
+                document.getElementById('quickAmenities').innerHTML = room.amenities
+                    .map(a => `<li>${a}</li>`)
+                    .join('');
+            }
+
+            // Rating
+            const rating = room.rating || 0;
+            document.getElementById('ratingStars').textContent = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+            document.getElementById('reviewCount').textContent = `${rating.toFixed(1)}/5.0 (${room.review_count} reviews)`;
+
+            // Set minimum date for availability check
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('checkInDate').min = today;
+            document.getElementById('checkOutDate').min = today;
+
+            // Display reviews
+            displayReviews(room.reviews || []);
+        }
+
+        function displayReviews(reviews) {
+            const container = document.getElementById('reviewsList');
+
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="no-reviews">No reviews yet. Be the first to review!</p>';
+                return;
+            }
+
+            let html = '';
+            reviews.forEach(review => {
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                html += `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div>
+                                <div class="review-author">${review.user_name}</div>
+                                <div class="review-date">${new Date(review.created_at).toLocaleDateString()}</div>
+                            </div>
+                            <div class="review-rating">${stars}</div>
+                        </div>
+                        <p class="review-comment">${review.comment || 'No comment'}</p>
+                        ${review.verified_booking ? '<small style="color: #27ae60;">✓ Verified Booking</small>' : ''}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        async function checkAvailability() {
+            const checkIn = document.getElementById('checkInDate').value;
+            const checkOut = document.getElementById('checkOutDate').value;
+
+            if (!checkIn || !checkOut) {
+                alert('Please select both dates');
+                return;
+            }
+
+            if (new Date(checkIn) >= new Date(checkOut)) {
+                alert('Check-out date must be after check-in date');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/rooms/check-availability`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        room_id: roomId,
+                        check_in: checkIn,
+                        check_out: checkOut
+                    })
+                });
+
+                const data = await response.json();
+                const resultDiv = document.getElementById('availabilityResult');
+
+                if (data.available) {
+                    resultDiv.className = 'availability-result available';
+                    resultDiv.textContent = '✓ Available for these dates!';
+                } else {
+                    resultDiv.className = 'availability-result unavailable';
+                    resultDiv.textContent = '✗ Not available for these dates';
+                }
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error checking availability');
+            }
+        }
+
+        function goToBooking() {
+            window.location.href = `booking.html?room_id=${roomId}`;
+        }
+    </script>
+</body>
+</html>
